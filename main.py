@@ -59,7 +59,7 @@ def printMenu(menuDict):
         i+=1 #increment counter
         if i!=len(listOfOptions):
             optionsString+=','   
-    userAnswer = int(input(f'Please select your choice: ({optionsString}) ').strip()) #strip to remove any whitespace
+    userAnswer = int(input(f'\nPlease select your choice ({optionsString}): ').strip()) #strip to remove any whitespace
     nextMenu=menuDict.get(userAnswer)
     if nextMenu==None:
         print(f"\n\n{userAnswer} is a Invalid Answer!")
