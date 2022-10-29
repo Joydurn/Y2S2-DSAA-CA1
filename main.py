@@ -53,15 +53,21 @@ def mainMenu():
     1: ["New", newThesaurus],
     2: ["Open", openThesaurus],
     3: ["Sort", sortMenu],
-    # "4": ["Process Text",processText],
-    # "5": ["Extra Option One",None], #to be added (find keyword corresponding to given synonym?)
-    # "6": ["Extra Option Two",None], #to be added (change keyword/synonyms?)
-    # "7": ["Print",printThesaurus],
-    # "8": ["Save",saveThesaurus],
-    # "9": ["Save As",saveAsThesaurus],
+    4: ["Process Text",processText],
+    # 5: ["Extra Option One",None], #to be added (find keyword corresponding to given synonym?)
+    # 6: ["Extra Option Two",None], #to be added (change keyword/synonyms?)
+    7: ["Print",printThesaurus],
+    8: ["Save",saveThesaurus],
+    9: ["Save As",saveAsThesaurus],
     10: ["Exit", exitSystem]
     }
     printMenu(mainMenuDict)
+
+def newThesaurus():
+    print('hello')
+
+def openThesaurus():
+    print('hi again')
 
 def sortMenu():
     sortMenuDict = {
@@ -74,11 +80,18 @@ def sortMenu():
     }
     printMenu(sortMenuDict)
 
-def newThesaurus():
-    print('hello')
+def processText():
+    print('hi again again')
 
-def openThesaurus():
-    print('hi again')
+def printThesaurus():
+    print('printing thesaurus')
+
+def saveThesaurus():
+    print('saving thesaurus')
+
+def saveAsThesaurus():
+    print('saving thesaurus as something')
+
 
 mainMenu()
 # welcomeMenu()
