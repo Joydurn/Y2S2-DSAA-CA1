@@ -93,9 +93,13 @@ def mainMenu():
     printMenu(mainMenuDict)
 
 def newThesaurus():
+    menuTree.push('New')
+    printTree()
     print('hello')
 
 def openThesaurus():
+    menuTree.push('Open')
+    printTree()
     print('hi again')
 
 def sortMenu():
@@ -112,15 +116,23 @@ def sortMenu():
     printMenu(sortMenuDict)
 
 def processText():
+    menuTree.push('Process Text')
+    printTree()
     print('hi again again')
 
 def printThesaurus():
+    menuTree.push('Print')
+    printTree()
     print('printing thesaurus')
 
 def saveThesaurus():
+    menuTree.push('Save')
+    printTree()
     print('saving thesaurus')
 
 def saveAsThesaurus():
+    menuTree.push('Save As')
+    printTree()
     print('saving thesaurus as something')
 
 
