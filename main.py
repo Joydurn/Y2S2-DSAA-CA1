@@ -43,15 +43,14 @@ def printTree():
     print(treeString)
 
 #function to print out any menu based on dictionary (dict contains menu options)
-def printMenu(menuDict):
+def printMenu(menuList):
     #printing the options
-    for key in sorted(menuDict.keys()):
+    for index,list in enumerate(menuList):
         for i in menuTree.items:
             print('\t',end=" ") #Indent depending on which level of menu we're at
-        print(f'{key}: {menuDict[key][0]}')
+        print(f'{index+1}: {list[0]}')
     
-    #get user input
-    listOfOptions=[key for key in menuDict.keys()]
+    listOfOptions = range(1,len(menuList)+1)
     optionsString=''
     i=0 #counter
     for x in listOfOptions:
@@ -59,38 +58,43 @@ def printMenu(menuDict):
         i+=1 #increment counter
         if i!=len(listOfOptions):
             optionsString+=','   
-    userAnswer = int(input(f'\nPlease select your choice ({optionsString}): ').strip()) #strip to remove any whitespace
-    nextMenu=menuDict.get(userAnswer)
-    if nextMenu==None:
+    userAnswer = input(f'\nPlease select your choice ({optionsString}): ').strip() #strip to remove any whitespace
+    #first check if integer
+    if userAnswer.isnumeric() and int(userAnswer)<=len(menuList):
+        userAnswer=int(userAnswer)
+        nextFunctionList=menuList[(userAnswer-1)]
+        #then go to next menu/function
+        if len(nextFunctionList)>2: #list more than 2 means we are going back to another menu
+            menuBack(nextFunctionList[2]) #set menu tree backwards
+            nextFunctionList[1]() #then execute next menu function
+        else:
+            nextFunctionList[1]() #execute given function
+    else:
         print(f"\n\n{userAnswer} is a Invalid Answer!")
         input('Press enter to continue...\n\n')
-        printMenu(menuDict) #recursion (restart menu)
-    else:
-        if len(nextMenu)>2: #list more than 2 means we are going back to another menu
-            menuBack(nextMenu[2]) #set menu tree backwards
-            nextMenu[1]() #then execute next menu function
-        else:
-            nextMenu[1]() #execute given function
+        printTree()
+        printMenu(menuList) #recursion (restart menu)
+    
 
 
 
 #functions to init menu dictionaries and then print them
 def mainMenu():
     menuTree.push('MAIN')
-    mainMenuDict =  {
-    1: ["New", newThesaurus],
-    2: ["Open", openThesaurus],
-    3: ["Sort", sortMenu],
-    4: ["Process Text",processText],
-    # 5: ["Extra Option One",None], #to be added (find keyword corresponding to given synonym?)
-    # 6: ["Extra Option Two",None], #to be added (change keyword/synonyms?)
-    7: ["Print",printThesaurus],
-    8: ["Save",saveThesaurus],
-    9: ["Save As",saveAsThesaurus],
-    10: ["Exit", exitSystem]
-    }
+    mainMenuList =  [
+    ["New", newThesaurus],
+    ["Open", openThesaurus],
+    ["Sort", sortMenu],
+    ["Process Text",processText],
+    ["Extra Option One",None], #to be added (find keyword corresponding to given synonym?)
+    ["Extra Option Two",None], #to be added (change keyword/synonyms?)
+    ["Print",printThesaurus],
+    ["Save",saveThesaurus],
+    ["Save As",saveAsThesaurus],
+    ["Exit", exitSystem]
+    ]
     printTree()
-    printMenu(mainMenuDict)
+    printMenu(mainMenuList)
 
 def newThesaurus():
     menuTree.push('New')
@@ -104,16 +108,16 @@ def openThesaurus():
 
 def sortMenu():
     menuTree.push('SORT')
-    sortMenuDict = {
-        1: ['Alphabetically (Default)',None],
-        2: ['Length/Alphabetically',None],
-        3: ['Length/Random Alphabetically',None],
-        4: ['Randomly',None],
-        5: ['Back to Main Menu', mainMenu,2], #2 indicate we are going back by 1 menu (pop from stack twice)
-        10: ["Exit", exitSystem]
-    }
+    sortMenuList = [
+        ['Alphabetically (Default)',None],
+        ['Length/Alphabetically',None],
+        ['Length/Random Alphabetically',None],
+        ['Randomly',None],
+        ['Back to Main Menu', mainMenu,2], #2 indicate we are going back by 1 menu (pop from stack twice)
+        ["Exit", exitSystem]
+    ]
     printTree()
-    printMenu(sortMenuDict)
+    printMenu(sortMenuList)
 
 def processText():
     menuTree.push('Process Text')
