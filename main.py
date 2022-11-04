@@ -1,8 +1,6 @@
 # Jayden Yap p2112790 DSAA CA1
 # Main program to run menu system
 #import modules
-from Stack import Stack #stack data structure
-
 # #Welcome message
 # def welcomeMenu():
 #     print('''
@@ -67,8 +65,12 @@ def printMenu(menuList):
         if len(nextFunctionList)>2: #list more than 2 means we are going back to another menu
             menuBack(nextFunctionList[2]) #set menu tree backwards
             nextFunctionList[1]() #then execute next menu function
+            
         else:
             nextFunctionList[1]() #execute given function
+            #if function returns here then redirect to main menu again
+            printTree()
+            printMenu(menuList)
     else:
         print(f"\n\n{userAnswer} is a Invalid Answer!")
         input('Press enter to continue...\n\n')
@@ -76,19 +78,17 @@ def printMenu(menuList):
         printMenu(menuList) #recursion (restart menu)
     
 
-
-
 #functions to init menu dictionaries and then print them
 def mainMenu():
     menuTree.push('MAIN')
     mainMenuList =  [
-    ["New", newThesaurus],
+    ["New", thesaurus.createNew],
     ["Open", openThesaurus],
     ["Sort", sortMenu],
     ["Process Text",processText],
     ["Extra Option One",None], #to be added (find keyword corresponding to given synonym?)
     ["Extra Option Two",None], #to be added (change keyword/synonyms?)
-    ["Print",printThesaurus],
+    ["Print",thesaurus.printThesaurus],
     ["Save",saveThesaurus],
     ["Save As",saveAsThesaurus],
     ["Exit", exitSystem]
@@ -124,11 +124,6 @@ def processText():
     printTree()
     print('hi again again')
 
-def printThesaurus():
-    menuTree.push('Print')
-    printTree()
-    print('printing thesaurus')
-
 def saveThesaurus():
     menuTree.push('Save')
     printTree()
@@ -145,6 +140,9 @@ def menuBack(times):
     for i in range(times):
         menuTree.pop()
 
+from Stack import Stack #stack data structure
+from Thesaurus import Thesaurus #thesaurus data structure
+thesaurus=Thesaurus()
 menuTree=Stack()
 mainMenu()
 # welcomeMenu()
