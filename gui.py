@@ -16,8 +16,13 @@
 # ''')
 #     input('Press enter to continue...\n\n')
 #     mainMenu() #proceed to main menu
+from stack import Stack
+from thesaurus import Thesaurus
+thesaurus=Thesaurus()
+menuTree=Stack()
 class GUI:
-    def __init__(self) -> None: pass
+    def __init__(self):
+        self.hello='hello'
 
     #function called when quit system is called 
     def exitSystem(self):
@@ -30,7 +35,7 @@ class GUI:
         treeString='\n*********************************************************\n* '
         n=54 #counter for number of spaces left in string (for formatting)
         x=0
-        for i in self.menuTree.items:
+        for i in menuTree.items:
             if(x>0): #if not first menu
                 n-=3 #subtract spaces
                 treeString+=' > '
@@ -46,7 +51,7 @@ class GUI:
     def printMenu(self,menuList):
         #printing the options
         for index,list in enumerate(menuList):
-            for i in self.menuTree.items:
+            for i in menuTree.items:
                 print('\t',end=" ") #Indent depending on which level of menu we're at
             print(f'{index+1}: {list[0]}')
         
@@ -59,20 +64,15 @@ class GUI:
             if i!=len(listOfOptions):
                 optionsString+=','   
         userAnswer = input(f'\nPlease select your choice ({optionsString}): ').strip() #strip to remove any whitespace
-        #first check if integer
+        #first check if integer and not out of range
         if userAnswer.isnumeric() and int(userAnswer)<=len(menuList):
             userAnswer=int(userAnswer)
             nextFunctionList=menuList[(userAnswer-1)]
             #then go to next menu/function
-            if len(nextFunctionList)>2: #list more than 2 means we are going back to another menu
-                self.menuBack(nextFunctionList[2]) #set menu tree backwards
-                nextFunctionList[1]() #then execute next menu function
-                
-            else:
-                nextFunctionList[1]() #execute given function
-                #if function returns here then redirect to main menu again
-                self.printTree()
-                self.printMenu(menuList)
+            nextFunctionList[1]() #execute given function
+            #if function returns here then redirect to main menu again
+            self.printTree()
+            self.printMenu(menuList)
         else:
             print(f"\n\n{userAnswer} is a Invalid Answer!")
             input('Press enter to continue...\n\n')
@@ -82,64 +82,64 @@ class GUI:
 
     #functions to init menu dictionaries and then print them
     def mainMenu(self):
-        self.menuTree.push('MAIN')
+        menuTree.items=['MAIN']
         mainMenuList =  [
-        ["New", Thesaurus.createNew],
+        ["New", thesaurus.createNew],
         ["Open", self.openThesaurus],
         ["Sort", self.sortMenu],
         ["Process Text",self.processText],
         ["Extra Option One",None], #to be added (find keyword corresponding to given synonym?)
         ["Extra Option Two",None], #to be added (change keyword/synonyms?)
-        ["Print",Thesaurus.printThesaurus],
-        ["Save",Thesaurus.saveThesaurus],
-        ["Save As",Thesaurus.saveAsThesaurus],
+        ["Print",thesaurus.printThesaurus],
+        ["Save",self.saveThesaurus],
+        ["Save As",self.saveAsThesaurus],
         ["Exit", self.exitSystem]
         ]
         self.printTree()
         self.printMenu(mainMenuList)
 
     def newThesaurus(self):
-        self.menuTree.push('New')
+        menuTree.push('New')
         self.printTree()
         print('hello')
 
     def openThesaurus(self):
-        self.menuTree.push('Open')
+        menuTree.push('Open')
         self.printTree()
         print('hi again')
 
     def sortMenu(self):
-        self.menuTree.push('SORT')
+        menuTree.push('SORT')
         sortMenuList = [
             ['Alphabetically (Default)',None],
             ['Length/Alphabetically',None],
             ['Length/Random Alphabetically',None],
             ['Randomly',None],
-            ['Back to Main Menu', self.mainMenu,2], #2 indicate we are going back by 1 menu (pop from stack twice)
+            ['Back to Main Menu', self.mainMenu], #2 indicate we are going back by 1 menu (pop from stack twice)
             ["Exit", self.exitSystem]
         ]
         self.printTree()
         self.printMenu(sortMenuList)
 
     def processText(self):
-        self.menuTree.push('Process Text')
+        menuTree.push('Process Text')
         self.printTree()
         print('hi again again')
 
     def saveThesaurus(self):
-        self.menuTree.push('Save')
+        menuTree.push('Save')
         self.printTree()
         print('saving thesaurus')
 
     def saveAsThesaurus(self):
-        self.menuTree.push('Save As')
+        menuTree.push('Save As')
         self.printTree()
         print('saving thesaurus as something')
 
     #menuTree is a system to keep track of which menu you're in (example Main>Sort>Alphabetical etc)
     def menuBack(self,times):
         for i in range(times):
-            self.menuTree.pop()
+            menuTree.pop()
     
     # welcomeMenu()
 
