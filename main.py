@@ -5,4 +5,5 @@ thesaurus=Thesaurus()
 stack=Stack()
 gui=GUI()
 
+# gui.welcomeMenu()
 gui.mainMenu()

@@ -1,31 +1,34 @@
 # Jayden Yap p2112790 DSAA CA1
 # Main program to run menu system
 #import modules
-# #Welcome message
-# def welcomeMenu():
-#     print('''
-# *********************************************************
-# * ST1507 DSAA: Welcome to:                              *
-# *                                                       *
-# * ~ Thesaurus Based Text Processing Application ~       *
-# *_______________________________________________________*
-# *                                                       *
-# * ~ Done by: Jayden Yap (2112790)                       *
-# * ~ Class DAAA/2B/04                                    *
-# *********************************************************
-# ''')
-#     input('Press enter to continue...\n\n')
-#     mainMenu() #proceed to main menu
+
 from stack import Stack
 from thesaurus import Thesaurus
 thesaurus=Thesaurus()
 menuTree=Stack()
 class GUI:
     def __init__(self):
-        self.hello='hello'
+        self.__name='Jayden Yap'
+        self.__studentID='2112790'
+        self.__courseClass='DAAA/2B/04'
 
-    #function called when quit system is called 
-    def exitSystem(self):
+    def welcomeMenu(self):
+        print(f'''
+    *********************************************************
+    * ST1507 DSAA: Welcome to:                              *
+    *                                                       *
+    * ~ Thesaurus Based Text Processing Application ~       *
+    *_______________________________________________________*
+    *                                                       *
+    * ~ Done by: {self.__name} ({self.__studentID})                       *
+    * ~ Class {self.__courseClass}                                *
+    *********************************************************
+    ''')
+        input('Press enter to continue...\n\n')
+        self.mainMenu() #proceed to main menu
+        #function called when quit system is called 
+
+    def __exitSystem(self):
         if len(thesaurus.dict)!=0:
             print('WARNING: A thesaurus is already loaded, proceeding will delete the previous thesaurus (unless it was already saved)')
             while True:
@@ -41,7 +44,7 @@ class GUI:
         raise SystemExit
 
     #function to print out current menu tree
-    def printTree(self):
+    def __printTree(self):
         #print current menu tree
         treeString='\n*********************************************************\n* '
         n=54 #counter for number of spaces left in string (for formatting)
@@ -59,7 +62,7 @@ class GUI:
         print(treeString)
 
     #function to print out any menu based on dictionary (dict contains menu options)
-    def printMenu(self,menuList):
+    def __printMenu(self,menuList):
         #printing the options
         for index,list in enumerate(menuList):
             for i in range(len(menuTree.items)-1): #only indent if on 2nd level menu
@@ -82,17 +85,17 @@ class GUI:
             #then go to next menu/function
             nextFunctionList[1]() #execute given function
             #if function returns here then redirect to main menu again
-            self.printTree()
-            self.printMenu(menuList)
+            self.__printTree()
+            self.__printMenu(menuList)
         else:
             print(f"\n\n{userAnswer} is a Invalid Answer!")
             input('Press enter to continue...\n\n')
-            self.printTree()
-            self.printMenu(menuList) #recursion (restart menu)
+            self.__printTree()
+            self.__printMenu(menuList) #recursion (restart menu)
     
     
-
-    def printThesaurus(self):
+    #function when printing thesaurus (option 7)
+    def __printThesaurus(self):
         if len(thesaurus.dict)==0:
             print('ERROR: No thesaurus found, try creating or opening one first, Returning to main menu')
             input('Press enter to continue...\n\n')
@@ -102,35 +105,31 @@ class GUI:
         input('Press enter to continue...\n')
 
 
-    #functions to init menu dictionaries and then print them
+    #functions to init menu dictionaries and then print them'
+    #REMEMBER TO PRIVATE THIS FUNCTION LATER
     def mainMenu(self):
         menuTree.items=['MAIN']
         mainMenuList =  [
-        ["New", self.createNew],
-        ["Open", self.openThesaurus],
-        ["Sort", self.sortMenu],
+        ["New", self.__createNew],
+        ["Open", self.__openThesaurus],
+        ["Sort", self.__sortMenu],
         ["Process Text",self.processText],
         ["Extra Option One",None], #to be added (find keyword corresponding to given synonym?)
         ["Extra Option Two",None], #to be added (change keyword/synonyms?)
-        ["Print",self.printThesaurus],
+        ["Print",self.__printThesaurus],
         ["Save",self.saveThesaurus],
         ["Save As",self.saveAsThesaurus],
-        ["Exit", self.exitSystem]
+        ["Exit", self.__exitSystem]
         ]
-        self.printTree()
-        self.printMenu(mainMenuList)
+        self.__printTree()
+        self.__printMenu(mainMenuList)
 
-    def newThesaurus(self):
-        menuTree.push('New')
-        self.printTree()
-        print('hello')
-
-    def openThesaurus(self):
+    def __openThesaurus(self):
         menuTree.push('Open')
-        self.printTree()
+        self.__printTree()
         print('hi again')
 
-    def sortMenu(self):
+    def __sortMenu(self):
         menuTree.push('SORT')
         sortMenuList = [
             ['Alphabetically (Default)',None],
@@ -138,24 +137,24 @@ class GUI:
             ['Length/Random Alphabetically',None],
             ['Randomly',None],
             ['Back to Main Menu', self.mainMenu], #2 indicate we are going back by 1 menu (pop from stack twice)
-            ["Exit", self.exitSystem]
+            ["Exit", self.__exitSystem]
         ]
-        self.printTree()
-        self.printMenu(sortMenuList)
+        self.__printTree()
+        self.__printMenu(sortMenuList)
 
     def processText(self):
         menuTree.push('Process Text')
-        self.printTree()
+        self.__printTree()
         print('hi again again')
 
     def saveThesaurus(self):
         menuTree.push('Save')
-        self.printTree()
+        self.__printTree()
         print('saving thesaurus')
 
     def saveAsThesaurus(self):
         menuTree.push('Save As')
-        self.printTree()
+        self.__printTree()
         print('saving thesaurus as something')
 
     #menuTree is a system to keep track of which menu you're in (example Main>Sort>Alphabetical etc)
@@ -163,20 +162,20 @@ class GUI:
         for i in range(times):
             menuTree.pop()
     
-    def createNew(self):
-        #nested functions for later
-        def getKeySynPair():
+    def __createNew(self):
+        #nested functions used later
+        def __getKeySynPair(keywordCount):
             #get keyword
             keyInvalid=True 
             while keyInvalid:
                 print('\t(Type 1 if done with this Thesaurus, type 2 to quit)')
-                keyword=input('\tEnter a keyword: ').strip().lower() 
+                keyword=input(f'\tEnter {self.__makeOrdinal(keywordCount)} keyword: ').strip().lower() 
                 if keyword=='1':
-                    finishThesaurus()
+                    __finishThesaurus()
                 elif keyword=='2':
                     self.mainMenu()
                 else:
-                    keyInvalid=keyIsInvalid(keyword)
+                    keyInvalid=__keyIsInvalid(keyword)
             #now get synonyms
             synList=[]
             synCount=1 #counter
@@ -185,20 +184,20 @@ class GUI:
                 synInvalid=True
                 while synInvalid:
                     print('\t\t(Type 1 if done with this keyword, type 2 to quit)')
-                    synonym=input(f'\t\tEnter {self.make_ordinal(synCount)} synonym for {keyword}: ').strip().lower() 
+                    synonym=input(f'\t\tEnter {self.__makeOrdinal(synCount)} synonym for {keyword}: ').strip().lower() 
                     if synonym in ['1','2']:
                         break
-                    synInvalid=synIsInvalid(synonym,synList)
-                    synCount+=1
+                    synInvalid=__synIsInvalid(keyword,synonym,synList)
                 if synonym=='1':
                     break 
                 elif synonym=='2':
                     self.mainMenu()
                 #add synonym 
                 synList.append(synonym)
-            return (keyword,synList) #return as tuple
+                synCount+=1
+            return (keyword,synList) #return keyword and synonym list pair as tuple
         #function to check if keys are valid
-        def keyIsInvalid(keyword):
+        def __keyIsInvalid(keyword):
             if keyword in thesaurus.dict:
                 print('\tKeyword already exists, please try again...')
                 return True
@@ -211,27 +210,33 @@ class GUI:
             else:
                 return False
         #function to check if synonym is valid, more lenient than for keyword
-        def synIsInvalid(synonym,synList):
-            if synonym in synList: #if was already entered
+        def __synIsInvalid(keyword,synonym,synList):
+            if synonym in thesaurus.dict or synonym==keyword:
+                print('\t\tSynonym is already a keyword! Please try again...')
+                return True
+            elif synonym in synList: #if was already entered
                 print('\t\tSynonym already entered, please try again...')
+                return True
+            elif any(synonym in sublist for sublist in thesaurus.dict.values()): 
+                print('\t\tSynonym already exists for another keyword, please try again...')
                 return True
             elif not synonym.isalpha(): #check if has numbers/symbols
                 print('\t\tOnly letters allowed, no numbers or symbols, try again')
                 return True
             else:
                 return False
-        def finishThesaurus():
+        def __finishThesaurus():
             #check if there are keywords
             if len(thesaurus.dict)==0:
                 input('No keywords entered! Press enter to continue...')
                 return 
             else:
                 print('Your new Thesaurus is ready! Here it is...')
-                self.printThesaurus()
+                self.__printThesaurus()
                 self.mainMenu()
 
         menuTree.push('New Thesaurus')
-        self.printTree()
+        self.__printTree()
         #check if dictionary exists already
         if len(thesaurus.dict)!=0:
             print('\tWARNING: A thesaurus is already loaded, proceeding will delete the previous thesaurus (unless it was already saved)')
@@ -246,18 +251,20 @@ class GUI:
                     print('\tInvalid answer, try again... \n')
         #refresh dictionary
         thesaurus.dict={}
+        keywordCount=0
         while True:
-            keyword,synList = getKeySynPair()
+            keywordCount+=1
+            keyword,synList = __getKeySynPair(keywordCount) #pass keyword count into function
             thesaurus.dict.update({keyword: synList})
-            print(f'\tAdded keyword "{keyword}" with the following synonyms: {synList}')
+            print(f'\tAdded keyword "{keyword}" with the following synonyms: {synList}\n')
     
 
-    def make_ordinal(self,n):
+    def __makeOrdinal(self,n):
         '''
         Convert an integer into its ordinal version:
-            make_ordinal(1)   -> '1st'
-            make_ordinal(3)   -> '3rd'
-            make_ordinal(122) -> '122nd'
+            __makeOrdinal(1)   -> '1st'
+            __makeOrdinal(3)   -> '3rd'
+            __makeOrdinal(122) -> '122nd'
         '''
         n = int(n)
         if 11 <= (n % 100) <= 13:
