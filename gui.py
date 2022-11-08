@@ -29,7 +29,7 @@ class GUI:
         #function called when quit system is called 
 
     def __exitSystem(self):
-        if len(thesaurus.dict)!=0:
+        if thesaurus.size()!=0:
             print('WARNING: A thesaurus is already loaded, proceeding will delete the previous thesaurus (unless it was already saved)')
             while True:
                 answer=input('Proceed? (y/n): ')
@@ -96,12 +96,16 @@ class GUI:
     
     #function when printing thesaurus (option 7)
     def __printThesaurus(self):
-        if len(thesaurus.dict)==0:
+        if thesaurus.size()==0: #if no thesaurus
             print('ERROR: No thesaurus found, try creating or opening one first, Returning to main menu')
             input('Press enter to continue...\n\n')
             self.mainMenu()
-        print('Printing Thesaurus now:')
-        print(thesaurus.dict)
+        fullList=thesaurus.getFullThesaurus()
+        print('Printing Thesaurus now:\n')
+        for keyword,synList in [sublist for sublist in fullList]:
+            print(f'{keyword.capitalize()}: ',end="")
+            print(*synList,sep=', ')
+
         input('Press enter to continue...\n')
 
 
@@ -117,8 +121,8 @@ class GUI:
         ["Extra Option One",None], #to be added (find keyword corresponding to given synonym?)
         ["Extra Option Two",None], #to be added (change keyword/synonyms?)
         ["Print",self.__printThesaurus],
-        ["Save",self.saveThesaurus],
-        ["Save As",self.saveAsThesaurus],
+        ["Save",self.__saveThesaurus],
+        ["Save As",self.__saveAsThesaurus],
         ["Exit", self.__exitSystem]
         ]
         self.__printTree()
@@ -130,12 +134,32 @@ class GUI:
         print('hi again')
 
     def __sortMenu(self):
+        def sortAlpha():
+            print('Sorting synonyms Alphabetically...')
+            thesaurus.sortAlphabetically()
+            self.__printThesaurus()
+
+        def sortLenAlpha():
+            print('Sorting synonyms first by Length, then Alphabetically...')
+            thesaurus.sortLengthAlphabetically()
+            self.__printThesaurus()
+
+        def sortLenRand():
+            print('Sorting synonyms first by Length, then randomly...')
+            thesaurus.sortLengthAlphabetically()
+            self.__printThesaurus()
+
+        def sortRand():
+            print('Sorting synonyms randomly...')
+            thesaurus.sortRandomly()
+            self.__printThesaurus()
+
         menuTree.push('SORT')
         sortMenuList = [
-            ['Alphabetically (Default)',None],
-            ['Length/Alphabetically',None],
-            ['Length/Random Alphabetically',None],
-            ['Randomly',None],
+            ['Alphabetically (Default)',sortAlpha],
+            ['Length/Alphabetically',sortLenAlpha],
+            ['Length/Random Alphabetically',sortLenRand],
+            ['Randomly',sortRand],
             ['Back to Main Menu', self.mainMenu], #2 indicate we are going back by 1 menu (pop from stack twice)
             ["Exit", self.__exitSystem]
         ]
@@ -147,18 +171,17 @@ class GUI:
         self.__printTree()
         print('hi again again')
 
-    def saveThesaurus(self):
+    def __saveThesaurus(self):
         menuTree.push('Save')
         self.__printTree()
         print('saving thesaurus')
 
-    def saveAsThesaurus(self):
+    def __saveAsThesaurus(self):
         menuTree.push('Save As')
         self.__printTree()
         print('saving thesaurus as something')
 
-    #menuTree is a system to keep track of which menu you're in (example Main>Sort>Alphabetical etc)
-    def menuBack(self,times):
+    
         for i in range(times):
             menuTree.pop()
     
@@ -198,10 +221,10 @@ class GUI:
             return (keyword,synList) #return keyword and synonym list pair as tuple
         #function to check if keys are valid
         def __keyIsInvalid(keyword):
-            if keyword in thesaurus.dict:
+            if keyword in thesaurus.getKeywords():
                 print('\tKeyword already exists, please try again...')
                 return True
-            elif any(keyword in sublist for sublist in thesaurus.dict.values()): 
+            elif any(keyword in sublist for sublist in thesaurus.getAllSynonyms()): 
                 print('\tKeyword already exists as a synonym, please try again...')
                 return True
             elif not keyword.isalpha(): #check if has numbers/symbols
@@ -211,13 +234,13 @@ class GUI:
                 return False
         #function to check if synonym is valid, more lenient than for keyword
         def __synIsInvalid(keyword,synonym,synList):
-            if synonym in thesaurus.dict or synonym==keyword:
+            if synonym in thesaurus.getKeywords() or synonym==keyword:
                 print('\t\tSynonym is already a keyword! Please try again...')
                 return True
             elif synonym in synList: #if was already entered
                 print('\t\tSynonym already entered, please try again...')
                 return True
-            elif any(synonym in sublist for sublist in thesaurus.dict.values()): 
+            elif any(synonym in sublist for sublist in thesaurus.getAllSynonyms()): 
                 print('\t\tSynonym already exists for another keyword, please try again...')
                 return True
             elif not synonym.isalpha(): #check if has numbers/symbols
@@ -227,18 +250,20 @@ class GUI:
                 return False
         def __finishThesaurus():
             #check if there are keywords
-            if len(thesaurus.dict)==0:
+            if thesaurus.size()==0:
                 input('No keywords entered! Press enter to continue...')
                 return 
             else:
                 print('Your new Thesaurus is ready! Here it is...')
+                #sort alphabetically by default
+                thesaurus.sortAlphabetically()
                 self.__printThesaurus()
                 self.mainMenu()
 
         menuTree.push('New Thesaurus')
         self.__printTree()
-        #check if dictionary exists already
-        if len(thesaurus.dict)!=0:
+        #check if thesaurus exists already
+        if thesaurus.size()!=0:
             print('\tWARNING: A thesaurus is already loaded, proceeding will delete the previous thesaurus (unless it was already saved)')
             while True:
                 answer=input('\tProceed? (y/n): ')
@@ -249,16 +274,15 @@ class GUI:
                     self.mainMenu()
                 else:
                     print('\tInvalid answer, try again... \n')
-        #refresh dictionary
-        thesaurus.dict={}
+        #refresh thesaurus to empty
+        thesaurus.refresh()
         keywordCount=0
         while True:
             keywordCount+=1
             keyword,synList = __getKeySynPair(keywordCount) #pass keyword count into function
-            thesaurus.dict.update({keyword: synList})
+            thesaurus.addKeySynPair(keyword, synList)
             print(f'\tAdded keyword "{keyword}" with the following synonyms: {synList}\n')
     
-
     def __makeOrdinal(self,n):
         '''
         Convert an integer into its ordinal version:
