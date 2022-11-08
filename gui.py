@@ -1,7 +1,7 @@
 # Jayden Yap p2112790 DSAA CA1
 # Main program to run menu system
 #import modules
-
+from os import listdir
 from stack import Stack
 from thesaurus import Thesaurus
 thesaurus=Thesaurus()
@@ -11,6 +11,7 @@ class GUI:
         self.__name='Jayden Yap'
         self.__studentID='2112790'
         self.__courseClass='DAAA/2B/04'
+        self.__fileName=None
 
     def welcomeMenu(self):
         print(f'''
@@ -100,13 +101,16 @@ class GUI:
             print('ERROR: No thesaurus found, try creating or opening one first, Returning to main menu')
             input('Press enter to continue...\n\n')
             self.mainMenu()
+        menuTree.push('Print')
+        self.__printTree()
         fullList=thesaurus.getFullThesaurus()
         print('Printing Thesaurus now:\n')
-        for keyword,synList in [sublist for sublist in fullList]:
-            print(f'{keyword.capitalize()}: ',end="")
-            print(*synList,sep=', ')
-
+        print(thesaurus.getStringFormat())
         input('Press enter to continue...\n')
+        self.mainMenu()
+        
+
+
 
 
     #functions to init menu dictionaries and then print them'
@@ -127,11 +131,6 @@ class GUI:
         ]
         self.__printTree()
         self.__printMenu(mainMenuList)
-
-    def __openThesaurus(self):
-        menuTree.push('Open')
-        self.__printTree()
-        print('hi again')
 
     def __sortMenu(self):
         def sortAlpha():
@@ -171,20 +170,80 @@ class GUI:
         self.__printTree()
         print('hi again again')
 
+    def __openThesaurus(self):
+        menuTree.push('Open')
+        self.__printTree()
+        print('\tAvailable files:')
+        print('\t'+', '.join(listdir('thesaurus'))) #tab followed by all filenames seperated by ', '
+        print('\t(Type 1 to quit)')
+        fileName=input('\tPlease enter full file name you want to open: (with .txt): ')
+        if fileName=='1':
+            self.mainMenu()
+        else:
+            try:
+                with open(f"thesaurus/{fileName}","r") as f:
+                    string=f.read() #read from file
+                thesaurus.createFromString(string)
+                print(f'Successfully read Thesaurus from file "{fileName}"')
+                self.__printThesaurus()
+                self.__fileName=fileName
+            except Exception as e:
+                print(e)
+                print('Please try again...')
+                input('Press enter to continue...')
+                menuTree.pop()
+                self.__openThesaurus()
+            
     def __saveThesaurus(self):
-        menuTree.push('Save')
+        if thesaurus.size()==0: #if no thesaurus
+            print('ERROR: No thesaurus found, try creating or opening one first, Returning to main menu')
+            input('Press enter to continue...\n\n')
+            self.mainMenu()
+        menuTree.push('Save Thesaurus')
         self.__printTree()
         print('saving thesaurus')
 
     def __saveAsThesaurus(self):
+        if thesaurus.size()==0: #if no thesaurus
+            print('ERROR: No thesaurus found, try creating or opening one first, Returning to main menu')
+            input('Press enter to continue...\n\n')
+            self.mainMenu()
         menuTree.push('Save As')
         self.__printTree()
-        print('saving thesaurus as something')
-
-    
-        for i in range(times):
-            menuTree.pop()
-    
+        print('(Type 1 to quit)')
+        newFileName=input(f'Please enter filename: ').strip()
+        if newFileName=='1': 
+            self.mainMenu()
+        else:
+            while True: 
+                confirm=input(f'Are you sure you want to save to /thesaurus/{newFileName}.txt? (y/n): ').strip().lower()
+                if confirm=='n':
+                    print('Going back to main menu!')  #go back to start 
+                    input('Press enter to continue...')
+                    self.mainMenu()
+                elif confirm=='y':
+                    thesaurusString=thesaurus.getStringFormat()
+                    try:
+                        with open(f"thesaurus/{newFileName}.txt","x") as f:
+                            f.write(thesaurusString) #write to file
+                        print('Save Complete! Going back to main menu...')
+                        input('Press enter to continue...')
+                        self.mainMenu()
+                    except Exception as e:
+                        error=e.args[0] #get error code
+                        if error==22:
+                            print(f'Invalid Filename! "{newFileName}.txt"')
+                        elif error==17:
+                            print(f'File already exists!')
+                        else:
+                            print(e)
+                        input('Press enter to continue...')
+                        menuTree.pop() 
+                        self.__saveAsThesaurus()
+                else:
+                    print('Invalid answer! Please try again...')
+                    print('Press enter to continue')
+                
     def __createNew(self):
         #nested functions used later
         def __getKeySynPair(keywordCount):
@@ -257,6 +316,7 @@ class GUI:
                 print('Your new Thesaurus is ready! Here it is...')
                 #sort alphabetically by default
                 thesaurus.sortAlphabetically()
+                thesaurus.sortKeywords()
                 self.__printThesaurus()
                 self.mainMenu()
 
