@@ -1,4 +1,5 @@
 import random
+import re
 class Thesaurus: 
     def __init__(self):
         # self.__fullList=[]
@@ -10,6 +11,11 @@ class Thesaurus:
     def __str__(self):
         return f'{self.__fullList}'
 
+    def isEmpty(self):
+        if not self.__fullList:
+            return True 
+        else: 
+            return False
     def getStringFormat(self):
         fullList=self.getFullThesaurus()
         string=''
@@ -140,14 +146,13 @@ class Thesaurus:
 
             items_greater = []
             items_lower = []
-
             for item in symList:
                 if __compare(item,pivot):
                     items_greater.append(item)
                 else:
                     items_lower.append(item)
-
             return __sort(items_lower) + [pivot] + __sort(items_greater)
+            
         for keyIndex,subList in enumerate(self.__fullList): #sorting every synonym list
             symList=subList[1]
             self.__fullList[keyIndex][1]=__sort(symList)
@@ -202,8 +207,65 @@ class Thesaurus:
         for keyIndex,subList in enumerate(self.__fullList): #sorting every synonym list
             symList=subList[1]
             self.__fullList[keyIndex][1]=__sort(symList)
-     
     
+    def splitNonAlpha(self,s):  #splits string into different words, ignoring punctuations and spaces
+            list=re.split('\W+', s)
+            return list
+
+    def simplifyString(self,string):
+        # newString=string
+        # wordsList=self.splitNonAlpha(newString)
+        # #for every word in the string
+        # for word in wordsList:
+        #     #check if word matches keyword
+        #     for keyword,synList in [sublist for sublist in self.getFullThesaurus()]:
+        #         if word.lower() in synList:
+        #             newString=newString.replace(word,keyword) #replace word with keyword
+        # return newString
+
+        newString=string
+        wordsList=self.splitNonAlpha(newString)
+        #for every word in the string
+        for word in wordsList:
+            #check if word matches keyword
+            for keyword,synList in [sublist for sublist in self.getFullThesaurus()]:
+                if word.lower() in synList:
+                    newString=newString.replace(word,keyword) #replace word with keyword
+        return newString
+
+    def elegantString(self,string): #for elegant we must iterate through the synonyms too
+        def getCountList(text):
+            #get unique only 
+            str_=text
+            wordSet=set([word.lower() for word in self.splitNonAlpha(str_)])
+            countList=[]
+            for word in wordSet: 
+                countList.append(string.count(word))
+            return (wordSet,countList)
+
+        newString=string
+        wordSet,countList=getCountList(newString)
+        #for every word in the string
+        # for count,word in zip(countList,wordSet):
+        #check if word matches keyword
+        for keyword,synList in [sublist for sublist in self.getFullThesaurus()]:
+            if keyword in wordSet:
+                index=list(wordSet).index(keyword)
+                if countList[index]>1: #if more than one occurence in string
+                    for occurence in range(countList[index]): #for every occurence
+                        newString=newString.replace(keyword,synList[occurence],1) #only replace once with different synonyms each time
+                else: #else only one
+                    newString.replace(keyword,synList[0],1)
+    
+
+
+        return newString
+
+
+
+        
+
+
 
     
 

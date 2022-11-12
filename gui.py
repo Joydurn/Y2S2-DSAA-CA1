@@ -2,10 +2,10 @@
 # Main program to run menu system
 #import modules
 from os import listdir
-from stack import Stack
+from stack import menu_stack
 from thesaurus import Thesaurus
 thesaurus=Thesaurus()
-menuTree=Stack()
+menuStack=menu_stack()
 class GUI:
     def __init__(self):
         self.__name='Jayden Yap'
@@ -47,28 +47,30 @@ class GUI:
     #function to print out current menu tree
     def __printTree(self):
         #print current menu tree
-        treeString='\n*********************************************************\n* '
-        n=54 #counter for number of spaces left in string (for formatting)
-        x=0
-        for i in menuTree.items:
-            if(x>0): #if not first menu
-                n-=3 #subtract spaces
-                treeString+=' > '
-            n-=len(f'{i}') #subtract length of string from number of spaces left 
-            treeString+= f'{i.upper()}'
-            x+=1
-        for i in range(n):
-            treeString+=' '
+        treeString='*'*54+'\n* ' 
+        menusString=''
+        print(menuStack.getList())
+        for index,item in enumerate(menuStack.getList()): 
+            if index>0:
+                menusString+=' > ' #add connector if not first menu
+            menusString+=f'{item.upper()}'
+        treeString+=menusString.ljust(51) #add padding for formatting
         treeString+='*\n'
+        #print file name of thesaurus (if present)
+        if self.__fileName is not None: 
+            loadedString=f'* LOADED: {self.__fileName}'
+            treeString+=loadedString.ljust(53)+'*\n'
+        elif not thesaurus.isEmpty(): #if thesaurus was created
+            treeString+='* THESAURUS LOADED'.ljust(53)+'*\n'
         print(treeString)
 
     #function to print out any menu based on dictionary (dict contains menu options)
     def __printMenu(self,menuList):
         #printing the options
-        for index,list in enumerate(menuList):
-            for i in range(len(menuTree.items)-1): #only indent if on 2nd level menu
-                print('\t',end=" ") #Indent depending on which level of menu we're at
-            print(f'{index+1}: {list[0]}')
+        for index,subList in enumerate(menuList):
+            if menuStack.size()>1: #if we on at least 2nd level of menu
+                print('\t',end=" ") #Indent text
+            print(f'{index+1}: {subList[0]}')
         
         listOfOptions = range(1,len(menuList)+1)
         optionsString=''
@@ -101,7 +103,7 @@ class GUI:
             print('ERROR: No thesaurus found, try creating or opening one first, Returning to main menu')
             input('Press enter to continue...\n\n')
             self.mainMenu()
-        menuTree.push('Print')
+        menuStack.push('Print')
         self.__printTree()
         fullList=thesaurus.getFullThesaurus()
         print('Printing Thesaurus now:\n')
@@ -116,12 +118,12 @@ class GUI:
     #functions to init menu dictionaries and then print them'
     #REMEMBER TO PRIVATE THIS FUNCTION LATER
     def mainMenu(self):
-        menuTree.items=['MAIN']
+        menuStack.resetToMain()
         mainMenuList =  [
         ["New", self.__createNew],
         ["Open", self.__openThesaurus],
         ["Sort", self.__sortMenu],
-        ["Process Text",self.processText],
+        ["Process Text",self.__inputTextMenu],
         ["Extra Option One",None], #to be added (find keyword corresponding to given synonym?)
         ["Extra Option Two",None], #to be added (change keyword/synonyms?)
         ["Print",self.__printThesaurus],
@@ -153,30 +155,107 @@ class GUI:
             thesaurus.sortRandomly()
             self.__printThesaurus()
 
-        menuTree.push('SORT')
         sortMenuList = [
             ['Alphabetically (Default)',sortAlpha],
             ['Length/Alphabetically',sortLenAlpha],
             ['Length/Random Alphabetically',sortLenRand],
             ['Randomly',sortRand],
-            ['Back to Main Menu', self.mainMenu], #2 indicate we are going back by 1 menu (pop from stack twice)
+            ['Back to Main Menu', self.mainMenu],
             ["Exit", self.__exitSystem]
         ]
+        menuStack.push('SORT')
         self.__printTree()
         self.__printMenu(sortMenuList)
 
-    def processText(self):
-        menuTree.push('Process Text')
+    def __inputTextMenu(self):
+        def inputText():
+            menuStack.push('Input')
+            self.__printTree()
+            print('\t(Type 1 to quit)')
+            inputText=input('\tPlease input the text you want to process:\n\t')
+            if inputText=='1':
+                self.mainMenu()
+            else:
+                self.__processTextMenu(inputText)
+
+        def __openText():
+            menuStack.push('Open')
+            self.__printTree()
+            print('\tAvailable files:')
+            print('\t'+', '.join(listdir('text'))) #tab followed by all filenames seperated by ', '
+            print('\t(Type 1 to quit)')
+            fileName=input('\tPlease enter full file name you want to open: (with .txt):\n\t')
+            if fileName=='1':
+                self.mainMenu()
+            else:
+                try:
+                    with open(f"text/{fileName}","r") as f:
+                        string=f.read() #read from file
+                    print(f'Successfully read text from file "{fileName}"')
+                    print('Previewing now...')
+                    print(string)
+                    input('Press enter to continue...')
+                    self.__processTextMenu(string)
+                except Exception as e:
+                    print(e)
+                    print('Please try again...')
+                    input('Press enter to continue...')
+                    menuStack.pop()
+                    __openText()
+
+        menuStack.push('Processing')
+        processTextMenuList=[
+        ["Input your own Text",inputText],
+        ["Open a text file",__openText],
+        ["Back to Main Menu",self.mainMenu]
+        ]
         self.__printTree()
-        print('hi again again')
+        self.__printMenu(processTextMenuList)
+
+    def __processTextMenu(self,text):
+        def __simpWriting():
+            try:
+                processed=thesaurus.simplifyString(text)
+            except Exception as e: 
+                print(e)
+                print('Please try again...')
+                input('Press enter to continue...')
+                menuStack.pop()
+                self.processTextMenu(text)
+            print('\tConverted Text:')
+            print(f'\t{processed}')
+            input('Press enter to continue...')
+            
+        def __elegWriting():
+            try:
+                processed=thesaurus.elegantString(text)
+            except Exception as e: 
+                print(e)
+                print('Please try again...')
+                input('Press enter to continue...')
+                menuStack.pop()
+                self.processTextMenu(text)
+            print('\tConverted Text:')
+            print(f'\t{processed}')
+            input('Press enter to continue...')
+
+        menuStack.push('Process Text')
+        processTextMenuList=[
+        ["Simplified Writing",__simpWriting],
+        ["Elegant Writing",__elegWriting],
+        ["Back to Main Menu",self.mainMenu]
+        ]
+        self.__printTree()
+        self.__printMenu(processTextMenuList)
+
 
     def __openThesaurus(self):
-        menuTree.push('Open')
+        menuStack.push('Open')
         self.__printTree()
         print('\tAvailable files:')
         print('\t'+', '.join(listdir('thesaurus'))) #tab followed by all filenames seperated by ', '
         print('\t(Type 1 to quit)')
-        fileName=input('\tPlease enter full file name you want to open: (with .txt): ')
+        fileName=input('\tPlease enter full file name you want to open: (with .txt):\n\t')
         if fileName=='1':
             self.mainMenu()
         else:
@@ -185,13 +264,13 @@ class GUI:
                     string=f.read() #read from file
                 thesaurus.createFromString(string)
                 print(f'Successfully read Thesaurus from file "{fileName}"')
-                self.__printThesaurus()
                 self.__fileName=fileName
+                self.__printThesaurus()
             except Exception as e:
                 print(e)
                 print('Please try again...')
                 input('Press enter to continue...')
-                menuTree.pop()
+                menuStack.pop()
                 self.__openThesaurus()
             
     def __saveThesaurus(self):
@@ -199,7 +278,7 @@ class GUI:
             print('ERROR: No thesaurus found, try creating or opening one first, Returning to main menu')
             input('Press enter to continue...\n\n')
             self.mainMenu()
-        menuTree.push('Save Thesaurus')
+        menuStack.push('Save Thesaurus')
         self.__printTree()
         print('saving thesaurus')
 
@@ -208,7 +287,7 @@ class GUI:
             print('ERROR: No thesaurus found, try creating or opening one first, Returning to main menu')
             input('Press enter to continue...\n\n')
             self.mainMenu()
-        menuTree.push('Save As')
+        menuStack.push('Save As')
         self.__printTree()
         print('(Type 1 to quit)')
         newFileName=input(f'Please enter filename: ').strip()
@@ -227,6 +306,7 @@ class GUI:
                         with open(f"thesaurus/{newFileName}.txt","x") as f:
                             f.write(thesaurusString) #write to file
                         print('Save Complete! Going back to main menu...')
+                        self.__fileName=newFileName
                         input('Press enter to continue...')
                         self.mainMenu()
                     except Exception as e:
@@ -238,7 +318,7 @@ class GUI:
                         else:
                             print(e)
                         input('Press enter to continue...')
-                        menuTree.pop() 
+                        menuStack.pop() 
                         self.__saveAsThesaurus()
                 else:
                     print('Invalid answer! Please try again...')
@@ -320,7 +400,7 @@ class GUI:
                 self.__printThesaurus()
                 self.mainMenu()
 
-        menuTree.push('New Thesaurus')
+        menuStack.push('New Thesaurus')
         self.__printTree()
         #check if thesaurus exists already
         if thesaurus.size()!=0:

@@ -1,18 +1,29 @@
 class Stack:
      def __init__(self):
-         self.items = []
+         self.__items = []
 
      def isEmpty(self): #boolean is it empty?
-         return self.items == []
+         return self.__items == []
 
      def push(self, item): #add item to top of stack
-         self.items.append(item)
+         self.__items.append(item)
 
      def pop(self): #remove item from top of stack
-         return self.items.pop()
+         return self.__items.pop()
 
      def peek(self): #get first element of stack (at the top)
-         return self.items[len(self.items)-1]
+         return self.__items[len(self.__items)-1]
 
      def size(self): #length
-         return len(self.items)
+         return len(self.__items)
+
+     def getList(self):
+        return self.__items
+
+#child class only for when the stack represents a menu
+class menu_stack(Stack):
+    def __init__(self):
+        super().__init__()
+    
+    def resetToMain(self):
+        self._Stack__items= ['MAIN']
