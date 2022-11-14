@@ -213,24 +213,22 @@ class Thesaurus:
             return list
 
     def simplifyString(self,string):
-        # newString=string
-        # wordsList=self.splitNonAlpha(newString)
-        # #for every word in the string
-        # for word in wordsList:
-        #     #check if word matches keyword
-        #     for keyword,synList in [sublist for sublist in self.getFullThesaurus()]:
-        #         if word.lower() in synList:
-        #             newString=newString.replace(word,keyword) #replace word with keyword
-        # return newString
-
         newString=string
-        wordsList=self.splitNonAlpha(newString)
+        wordsList=self.splitNonAlpha(newString) #get individual words
+        print(wordsList)
         #for every word in the string
         for word in wordsList:
             #check if word matches keyword
             for keyword,synList in [sublist for sublist in self.getFullThesaurus()]:
-                if word.lower() in synList:
-                    newString=newString.replace(word,keyword) #replace word with keyword
+                #check if lowercase match
+                if word.islower() and word in synList: 
+                    newString=newString.replace(word,keyword) #replace lowercase
+                #check if uppercase match
+                elif word.isupper() and word.lower() in synList:  
+                    newString=newString.replace(word,keyword.upper()) #replace uppercase
+                #check if capitalised match
+                elif (word[0].isupper() and word[1:].islower()) and word.lower() in synList: #check if capitalised
+                    newString=newString.replace(word,keyword.title()) #replace capitalised
         return newString
 
     def elegantString(self,string): #for elegant we must iterate through the synonyms too
@@ -240,25 +238,36 @@ class Thesaurus:
             wordSet=set([word.lower() for word in self.splitNonAlpha(str_)])
             countList=[]
             for word in wordSet: 
-                countList.append(string.count(word))
+                countList.append(string.lower().count(word)) 
             return (wordSet,countList)
 
+        def getOccurencesOfOneWord(wordsList,word):
+            list=[]
+            for x in wordsList:
+                if x.lower()==word.lower():
+                    list.append(x)
+            return list
+
+            
         newString=string
         wordSet,countList=getCountList(newString)
-        #for every word in the string
-        # for count,word in zip(countList,wordSet):
-        #check if word matches keyword
+        wordList=self.splitNonAlpha(newString)
+        
         for keyword,synList in [sublist for sublist in self.getFullThesaurus()]:
             if keyword in wordSet:
                 index=list(wordSet).index(keyword)
                 if countList[index]>1: #if more than one occurence in string
-                    for occurence in range(countList[index]): #for every occurence
-                        newString=newString.replace(keyword,synList[occurence],1) #only replace once with different synonyms each time
-                else: #else only one
+                    occurenceWords=getOccurencesOfOneWord(wordList,keyword) #get all occurences of keyword in string regardless of capitalisation
+                    for count,occurence in enumerate(occurenceWords): #for every occurence
+                        #now check capitalisations
+                        if occurence.islower():
+                            newString=newString.replace(occurence,synList[count],1) #replace lowercase
+                        elif occurence.isupper():
+                            newString=newString.replace(occurence,synList[count].upper(),1) #replace uppercase
+                        elif occurence[0].isupper() and occurence[1:].islower(): #if capitalised 
+                            newString=newString.replace(occurence,synList[count].title(),1) #replace capitalised
+                else: #else only one occurence
                     newString.replace(keyword,synList[0],1)
-    
-
-
         return newString
 
 

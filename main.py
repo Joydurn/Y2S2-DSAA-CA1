@@ -1,9 +1,10 @@
 from gui import GUI
-from stack import Stack #stack data structure
-from thesaurus import Thesaurus #thesaurus data structure
-# thesaurus=Thesaurus()
-# stack=Stack()
-gui=GUI()
 
-# gui.welcomeMenu()
-gui.mainMenu()
+def main():
+    gui=GUI()
+    gui.mainMenu()
+
+if __name__=='__main__':
+    main()
+else:
+    print('Not Authorised')

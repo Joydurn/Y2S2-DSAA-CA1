@@ -224,7 +224,7 @@ class GUI:
                 self.processTextMenu(text)
             print('\tConverted Text:')
             print(f'\t{processed}')
-            input('Press enter to continue...')
+            input('\tPress enter to continue...')
             
         def __elegWriting():
             try:
