@@ -5,7 +5,7 @@ class Thesaurus:
         # self.__fullList=[]
         self.__fullList=[
             ['sad',['depressed','down','bear','huge','momy']],
-            ['happy',['daring','adequate','bold','bait','cold','bear','beautiful']]
+            ['happy',['daring','adequate','bold','bait','cold','beautiful']]
         ]
     
     def __str__(self):
@@ -259,6 +259,8 @@ class Thesaurus:
                 if countList[index]>1: #if more than one occurence in string
                     occurenceWords=getOccurencesOfOneWord(wordList,keyword) #get all occurences of keyword in string regardless of capitalisation
                     for count,occurence in enumerate(occurenceWords): #for every occurence
+                        if count>=len(synList): #if not enough synonyms 
+                            count=0 #default count will be 0
                         #now check capitalisations
                         if occurence.islower():
                             newString=newString.replace(occurence,synList[count],1) #replace lowercase

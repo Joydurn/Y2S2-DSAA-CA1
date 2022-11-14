@@ -49,7 +49,6 @@ class GUI:
         #print current menu tree
         treeString='*'*54+'\n* ' 
         menusString=''
-        print(menuStack.getList())
         for index,item in enumerate(menuStack.getList()): 
             if index>0:
                 menusString+=' > ' #add connector if not first menu
@@ -110,9 +109,6 @@ class GUI:
         print(thesaurus.getStringFormat())
         input('Press enter to continue...\n')
         self.mainMenu()
-        
-
-
 
 
     #functions to init menu dictionaries and then print them'
