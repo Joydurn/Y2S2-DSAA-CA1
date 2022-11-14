@@ -3,9 +3,13 @@ import re
 class Thesaurus: 
     def __init__(self):
         # self.__fullList=[]
+        # self.__fullList=[
+        #     ['sad',['depressed','down','bear','huge','momy']],
+        #     ['happy',['daring','adequate','bold','bait','cold','beautiful']]
+        # ]
         self.__fullList=[
-            ['sad',['depressed','down','bear','huge','momy']],
-            ['happy',['daring','adequate','bold','bait','cold','beautiful']]
+            ['sad',['depressed']],
+            ['hello',['hi','greet']]
         ]
     
     def __str__(self):
@@ -271,6 +275,33 @@ class Thesaurus:
                 else: #else only one occurence
                     newString.replace(keyword,synList[0],1)
         return newString
+
+    #EXTRA OPTION 1: Get synonym for any word
+    def findSynonymFromWord(self,string):
+        #function to get random index excluding an index
+        def gen_random_number(low, high, exclude):
+            return random.choice(
+                [number for number in range(low, high)
+                if number not in exclude]
+            )
+
+        word=string.lower()
+        for keyword,synList in [sublist for sublist in self.__fullList]:
+            if keyword==word:
+                return synList[random.randint(0,len(synList)-1)] #return random synonym
+            elif word in synList:
+                if len(synList)==1: #only one synonym
+                    return keyword
+                elif len(synList)==2:
+                    index=synList.index(word)
+                    if index==0:
+                        return synList[1]
+                    else:
+                        return synList[0]
+                else:
+                    index=synList.index(word)
+                    return synList[gen_random_number(0,len(synList)-1,[index])] #return any synonym that is not the input given
+                
 
 
 

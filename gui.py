@@ -120,7 +120,7 @@ class GUI:
         ["Open", self.__openThesaurus],
         ["Sort", self.__sortMenu],
         ["Process Text",self.__inputTextMenu],
-        ["Extra Option One",None], #to be added (find keyword corresponding to given synonym?)
+        ["Find Synonym",self.__getSynonymFromWord], #to be added (find keyword corresponding to given synonym?)
         ["Extra Option Two",None], #to be added (change keyword/synonyms?)
         ["Print",self.__printThesaurus],
         ["Save",self.__saveThesaurus],
@@ -220,7 +220,8 @@ class GUI:
                 self.processTextMenu(text)
             print('\tConverted Text:')
             print(f'\t{processed}')
-            input('\tPress enter to continue...')
+            __saveFile(processed)
+            
             
         def __elegWriting():
             try:
@@ -233,7 +234,37 @@ class GUI:
                 self.processTextMenu(text)
             print('\tConverted Text:')
             print(f'\t{processed}')
-            input('Press enter to continue...')
+            __saveFile(processed)
+
+        def __saveFile(processed):
+            userInput=input('\tDo you want to save text to a file? y/n: ')
+            if userInput=='n':
+                print('Going back to main menu...')
+                self.mainMenu()
+            elif userInput=='y':
+                while True:
+                    fileName=input('Enter a file name (excluding .txt): ')
+                    try:
+                        with open(f"text/{fileName}.txt","x") as f:
+                            f.write(processed) #write to file
+                        print('Save Complete! Going back to main menu...')
+                        input('Press enter to continue...')
+                        self.mainMenu()
+                    except Exception as e:
+                        error=e.args[0] #get error code
+                        if error==22:
+                            print(f'Invalid Filename! "{fileName}.txt"')
+                        elif error==17:
+                            print(f'File already exists!')
+                        else:
+                            print(e)
+                        input('Press enter to continue...')
+                        menuStack.pop() 
+                        __saveFile(processed)
+            else:
+                print("Invalid input, please try again...")
+                input('Press enter to continue...')
+                __saveFile(processed)
 
         menuStack.push('Process Text')
         processTextMenuList=[
@@ -432,3 +463,24 @@ class GUI:
         else:
             suffix = ['th', 'st', 'nd', 'rd', 'th'][min(n % 10, 4)]
         return str(n) + suffix
+    
+    #EXTRA OPTION 1: Get synonym for any word
+    def __getSynonymFromWord(self):
+        menuStack.push('Get Synonym')
+        self.__printTree()
+        print('\t(Type 1 to quit)')
+        word=input('\tPlease enter your input word: ')
+        if word=='1':
+            self.mainMenu()
+        else:
+            synonym=thesaurus.findSynonymFromWord(word)
+            if synonym is None:
+                print('\tNo synonym found... please try again')
+                input('\tPress enter to continue...')
+                menuStack.pop()
+                self.__getSynonymFromWord()
+            else:
+                print(f'\tA synonym for {word} is {synonym}!')
+                input('\tPress enter to continue...')
+                menuStack.pop()
+                self.__getSynonymFromWord()
