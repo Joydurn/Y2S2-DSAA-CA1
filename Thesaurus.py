@@ -2,12 +2,12 @@ import random
 import re
 class Thesaurus: 
     def __init__(self):
-        # self.__fullList=[]
-        self.__fullList=[
-            ['sad',['depressed','down','dejected','miserable','unhappy','sorrowful','downhearted','despairing','regretful']],
-            ['happy',['content','cheerful','merry','joyful','jovial','jolly','delighted','gleeful','smiling']],
-            ['stressed',['anxious','nervous','worried','tensed','unnerved','strained']]
-        ]
+        self.__fullList=[]
+        # self.__fullList=[
+        #     ['sad',['depressed','down','dejected','miserable','unhappy','sorrowful','downhearted','despairing','regretful']],
+        #     ['happy',['content','cheerful','merry','joyful','jovial','jolly','delighted','gleeful','smiling']],
+        #     ['stressed',['anxious','nervous','worried','tensed','unnerved','strained']]
+        # ]
     
     def __str__(self):
         return f'{self.__fullList}'
@@ -86,6 +86,11 @@ class Thesaurus:
     def addKeySynPair(self,keyword,synList):
         self.__fullList.append([keyword,synList])
     
+    def removeKeyword(self,keyword):
+        for keyIndex,subList in enumerate(self.__fullList):
+            if subList[0]==keyword:
+                self.__fullList.pop(keyIndex)
+
     #refresh the thesaurus to empty 
     def refresh(self):
         self.__fullList=[]
