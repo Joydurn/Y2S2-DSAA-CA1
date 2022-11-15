@@ -3,13 +3,10 @@ import re
 class Thesaurus: 
     def __init__(self):
         # self.__fullList=[]
-        # self.__fullList=[
-        #     ['sad',['depressed','down','bear','huge','momy']],
-        #     ['happy',['daring','adequate','bold','bait','cold','beautiful']]
-        # ]
         self.__fullList=[
-            ['sad',['depressed']],
-            ['hello',['hi','greet']]
+            ['sad',['depressed','down','dejected','miserable','unhappy','sorrowful','downhearted','despairing','regretful']],
+            ['happy',['content','cheerful','merry','joyful','jovial','jolly','delighted','gleeful','smiling']],
+            ['stressed',['anxious','nervous','worried','tensed','unnerved','strained']]
         ]
     
     def __str__(self):
@@ -115,7 +112,7 @@ class Thesaurus:
             symList=subList[1]
             self.__fullList[keyIndex][1]=__sort(symList)
             
-    def sortKeywords(self): #only used when creating thesaurus
+    def sortKeywords(self): #only used when creating thesaurus and opening
         def __sort(keySynPairList): #actual algorithm used
             if len(keySynPairList) <=1:
                 return keySynPairList
@@ -217,6 +214,20 @@ class Thesaurus:
             return list
 
     def simplifyString(self,string):
+        #check if a word is capitalised
+        def isCapital(word):
+            if len(word)>2:
+                if word[0].isupper() and word[1:].islower():
+                    return True 
+                else: 
+                    return False
+            elif len(word)==2 and word[0].isupper() and word[1].islower():
+                return True
+            elif len(word)==1 and word.isupper():
+                return True 
+            else:
+                return False
+                
         newString=string
         wordsList=self.splitNonAlpha(newString) #get individual words
         print(wordsList)
@@ -231,7 +242,7 @@ class Thesaurus:
                 elif word.isupper() and word.lower() in synList:  
                     newString=newString.replace(word,keyword.upper()) #replace uppercase
                 #check if capitalised match
-                elif (word[0].isupper() and word[1:].islower()) and word.lower() in synList: #check if capitalised
+                elif isCapital(word) and word.lower() in synList: #check if capitalised
                     newString=newString.replace(word,keyword.title()) #replace capitalised
         return newString
 
@@ -276,32 +287,38 @@ class Thesaurus:
                     newString.replace(keyword,synList[0],1)
         return newString
 
-    #EXTRA OPTION 1: Get synonym for any word
+    #EXTRA OPTION 1: Get synonyms for any word
     def findSynonymFromWord(self,string):
         #function to get random index excluding an index
-        def gen_random_number(low, high, exclude):
-            return random.choice(
-                [number for number in range(low, high)
-                if number not in exclude]
-            )
+        # def gen_random_number(low, high, exclude):
+        #     return random.choice(
+        #         [number for number in range(low, high)
+        #         if number not in exclude]
+        #     )
 
         word=string.lower()
         for keyword,synList in [sublist for sublist in self.__fullList]:
             if keyword==word:
-                return synList[random.randint(0,len(synList)-1)] #return random synonym
+                return synList #return random synonym
             elif word in synList:
                 if len(synList)==1: #only one synonym
-                    return keyword
+                    return [keyword]
                 elif len(synList)==2:
                     index=synList.index(word)
                     if index==0:
-                        return synList[1]
+                        result=[synList[1]]
+                        result.insert(0,keyword)
+                        return result
                     else:
-                        return synList[0]
+                        result=[synList[0]]
+                        result.insert(0,keyword)
+                        return result
                 else:
-                    index=synList.index(word)
-                    return synList[gen_random_number(0,len(synList)-1,[index])] #return any synonym that is not the input given
-                
+                    synList.remove(word)
+                    synList.insert(0,keyword)
+                    return synList #return any synonym that is not the input given
+        
+    
 
 
 

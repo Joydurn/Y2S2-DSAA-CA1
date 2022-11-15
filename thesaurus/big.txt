@@ -1,0 +1,3 @@
+happy: content, cheerful, merry, joyful, jovial, jolly, delighted, gleeful, smiling
+sad: depressed, down, dejected, miserable, unhappy, sorrowful, downhearted, despairing, regretful
+stressed: anxious, nervous, worried, tensed, unnerved, strained

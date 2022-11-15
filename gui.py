@@ -11,7 +11,7 @@ class GUI:
         self.__name='Jayden Yap'
         self.__studentID='2112790'
         self.__courseClass='DAAA/2B/04'
-        self.__fileName=None
+        self.__fileName=None #file name to be loaded if a file is opened
 
     def welcomeMenu(self):
         print(f'''
@@ -30,7 +30,7 @@ class GUI:
         #function called when quit system is called 
 
     def __exitSystem(self):
-        if thesaurus.size()!=0:
+        if not thesaurus.isEmpty():
             print('WARNING: A thesaurus is already loaded, proceeding will delete the previous thesaurus (unless it was already saved)')
             while True:
                 answer=input('Proceed? (y/n): ')
@@ -98,10 +98,6 @@ class GUI:
     
     #function when printing thesaurus (option 7)
     def __printThesaurus(self):
-        if thesaurus.size()==0: #if no thesaurus
-            print('ERROR: No thesaurus found, try creating or opening one first, Returning to main menu')
-            input('Press enter to continue...\n\n')
-            self.mainMenu()
         menuStack.push('Print')
         self.__printTree()
         fullList=thesaurus.getFullThesaurus()
@@ -114,19 +110,40 @@ class GUI:
     #functions to init menu dictionaries and then print them'
     #REMEMBER TO PRIVATE THIS FUNCTION LATER
     def mainMenu(self):
+       
         menuStack.resetToMain()
         mainMenuList =  [
         ["New", self.__createNew],
         ["Open", self.__openThesaurus],
-        ["Sort", self.__sortMenu],
-        ["Process Text",self.__inputTextMenu],
-        ["Find Synonym",self.__getSynonymFromWord], #to be added (find keyword corresponding to given synonym?)
-        ["Extra Option Two",None], #to be added (change keyword/synonyms?)
-        ["Print",self.__printThesaurus],
-        ["Save",self.__saveThesaurus],
-        ["Save As",self.__saveAsThesaurus],
         ["Exit", self.__exitSystem]
         ]
+        #we will append options to the list depending on some conditions
+        if not thesaurus.isEmpty(): #if thesaurus is loaded
+            mainMenuList.insert(2,["Sort", self.__sortMenu])
+            mainMenuList.insert(3,["Process Text",self.__inputTextMenu])
+            mainMenuList.insert(4,["Find Synonym",self.__getSynonymFromWord])
+            mainMenuList.insert(5,["Extra Option Two",None])
+            mainMenuList.insert(6,["Print",self.__printThesaurus])
+            if self.__fileName is not None: #if thesaurus was loaded from a file, Save option should be visible
+                mainMenuList.insert(7,["Save",self.__save])
+                mainMenuList.insert(8,["Save As",self.__saveAs])
+            else:
+                mainMenuList.insert(7,["Save As",self.__saveAs])
+            
+
+        
+        # mainMenuList =  [
+        # ["New", self.__createNew],
+        # ["Open", self.__openThesaurus],
+        # ["Sort", self.__sortMenu],
+        # ["Process Text",self.__inputTextMenu],
+        # ["Find Synonym",self.__getSynonymFromWord], #to be added (find keyword corresponding to given synonym?)
+        # ["Extra Option Two",None], #to be added (change keyword/synonyms?)
+        # ["Print",self.__printThesaurus],
+        # ["Save",self.__save],
+        # ["Save As",self.__saveAs],
+        # ["Exit", self.__exitSystem]
+        # ]
         self.__printTree()
         self.__printMenu(mainMenuList)
 
@@ -292,6 +309,7 @@ class GUI:
                 thesaurus.createFromString(string)
                 print(f'Successfully read Thesaurus from file "{fileName}"')
                 self.__fileName=fileName
+                thesaurus.sortKeywords() #sort the keywords alphabetically
                 self.__printThesaurus()
             except Exception as e:
                 print(e)
@@ -300,56 +318,89 @@ class GUI:
                 menuStack.pop()
                 self.__openThesaurus()
             
-    def __saveThesaurus(self):
-        if thesaurus.size()==0: #if no thesaurus
+    def __save(self):
+        if thesaurus.isEmpty(): #if no thesaurus
             print('ERROR: No thesaurus found, try creating or opening one first, Returning to main menu')
             input('Press enter to continue...\n\n')
             self.mainMenu()
+        elif self.__fileName==None:
+            print('No file loaded, redirecting to Save As function...')
+            self.__saveAs()
         menuStack.push('Save Thesaurus')
         self.__printTree()
-        print('saving thesaurus')
+        answer=input(f'Are you sure you want to save/overwrite {self.__fileName}? y/n: ')
+        if answer=='y':
+            thesaurusString=thesaurus.getStringFormat()
+            try:
+                # with open(f"thesaurus/{self.__fileName}.txt", 'r') as file :
+                #     filedata = file.read()
+                # filedata=filedata.
+                with open(f"thesaurus/{self.__fileName}","w") as f:
+                    f.write(thesaurusString) #write to file
+                print('\tSave Complete! Going back to main menu...')
+                input('\tPress enter to continue...')
+                self.mainMenu()
+            except Exception as e:
+                error=e.args[0] #get error code
+                if error==22:
+                    print(f'\tInvalid Filename! "{self.__fileName}"')
+                elif error==17:
+                    print(f'\tFile already exists!')
+                else:
+                    print(e)
+                input('\tPress enter to continue...')
+                menuStack.pop() 
+                self.__save()
+        elif answer=='n':
+            self.mainMenu()
+        else:
+            print('Invalid answer, please try again!')
+            input('Press enter to continue...')
+            menuStack.pop()
+            self.__save()
 
-    def __saveAsThesaurus(self):
+    def __saveAs(self):
         if thesaurus.size()==0: #if no thesaurus
             print('ERROR: No thesaurus found, try creating or opening one first, Returning to main menu')
             input('Press enter to continue...\n\n')
             self.mainMenu()
         menuStack.push('Save As')
         self.__printTree()
-        print('(Type 1 to quit)')
-        newFileName=input(f'Please enter filename: ').strip()
+        print('\tExisting files:')
+        print('\t'+', '.join(listdir('thesaurus'))) #tab followed by all filenames seperated by ', '
+        print('\t(Type 1 to quit)')
+        newFileName=input(f'\tPlease enter new filename: ').strip()
         if newFileName=='1': 
             self.mainMenu()
         else:
             while True: 
-                confirm=input(f'Are you sure you want to save to /thesaurus/{newFileName}.txt? (y/n): ').strip().lower()
+                confirm=input(f'\tAre you sure you want to save to /thesaurus/{newFileName}.txt? (y/n): ').strip().lower()
                 if confirm=='n':
-                    print('Going back to main menu!')  #go back to start 
-                    input('Press enter to continue...')
-                    self.mainMenu()
+                    menuStack.pop()
+                    self.__saveAs()
                 elif confirm=='y':
                     thesaurusString=thesaurus.getStringFormat()
                     try:
                         with open(f"thesaurus/{newFileName}.txt","x") as f:
                             f.write(thesaurusString) #write to file
-                        print('Save Complete! Going back to main menu...')
-                        self.__fileName=newFileName
-                        input('Press enter to continue...')
+                        print('\tSave Complete! Going back to main menu...')
+                        self.__fileName=f'{newFileName}.txt'
+                        input('\tPress enter to continue...')
                         self.mainMenu()
                     except Exception as e:
                         error=e.args[0] #get error code
                         if error==22:
-                            print(f'Invalid Filename! "{newFileName}.txt"')
+                            print(f'\tInvalid Filename! "{newFileName}.txt"')
                         elif error==17:
-                            print(f'File already exists!')
+                            print(f'\tFile already exists!')
                         else:
                             print(e)
-                        input('Press enter to continue...')
+                        input('\tPress enter to continue...')
                         menuStack.pop() 
-                        self.__saveAsThesaurus()
+                        self.__saveAs()
                 else:
-                    print('Invalid answer! Please try again...')
-                    print('Press enter to continue')
+                    print('\tInvalid answer! Please try again...')
+                    print('\tPress enter to continue')
                 
     def __createNew(self):
         #nested functions used later
@@ -473,14 +524,16 @@ class GUI:
         if word=='1':
             self.mainMenu()
         else:
-            synonym=thesaurus.findSynonymFromWord(word)
-            if synonym is None:
+            synList=thesaurus.findSynonymFromWord(word)
+            if synList is None:
                 print('\tNo synonym found... please try again')
                 input('\tPress enter to continue...')
                 menuStack.pop()
                 self.__getSynonymFromWord()
             else:
-                print(f'\tA synonym for {word} is {synonym}!')
+                print(f"\tHere are synonyms for '{word}':")
+                for syn in synList:
+                    print(f'\t{syn.title()}')
                 input('\tPress enter to continue...')
                 menuStack.pop()
                 self.__getSynonymFromWord()
