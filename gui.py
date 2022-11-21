@@ -1,4 +1,4 @@
-# Jayden Yap p2112790 DSAA CA1
+# Jayden Yap p2112790 DAAA/2B/04 DSAA CA1 gui.py
 # Main program to run menu system
 #import modules
 from os import listdir
@@ -41,7 +41,7 @@ class GUI:
                     self.mainMenu()
                 else:
                     print('Invalid answer, try again... \n')
-        print('\nProgram closing... Goodbye!\n')
+        print('\nBye, thanks for using ST1507 DSAA: Thesaurus Based ext Processor\n')
         raise SystemExit
 
     #function to print out current menu stack
@@ -343,8 +343,6 @@ class GUI:
                 error=e.args[0] #get error code
                 if error==22:
                     print(f'\tInvalid Filename! "{self.__fileName}"')
-                elif error==17:
-                    print(f'\tFile already exists!')
                 else:
                     print(e)
                 input('\tPress enter to continue...')
@@ -363,16 +361,20 @@ class GUI:
             print('ERROR: No thesaurus found, try creating or opening one first, Returning to main menu')
             input('Press enter to continue...\n\n')
             self.mainMenu()
+        
         menuStack.push('Save As')
         self.__printStack()
         print('\tExisting files:')
-        print('\t'+', '.join(listdir('thesaurus'))) #tab followed by all filenames seperated by ', '
+        directory=listdir('thesaurus')
+        print('\t'+', '.join(directory)) #tab followed by all filenames seperated by ', '
         print('\t(Type 1 to quit)')
-        newFileName=input(f'\tPlease enter new filename: ').strip()
+        newFileName=input(f'\tPlease enter new filename (without .txt): ').strip()
         if newFileName=='1': 
             self.mainMenu()
         else:
             while True: 
+                if f'{newFileName}.txt' in directory: #if existing file name
+                    print(f'\tWARNING: A file with name {newFileName}.txt already exists!')
                 confirm=input(f'\tAre you sure you want to save to /thesaurus/{newFileName}.txt? (y/n): ').strip().lower()
                 if confirm=='n':
                     menuStack.pop()
@@ -380,7 +382,7 @@ class GUI:
                 elif confirm=='y':
                     thesaurusString=thesaurus.getStringFormat()
                     try:
-                        with open(f"thesaurus/{newFileName}.txt","x") as f:
+                        with open(f"thesaurus/{newFileName}.txt","w") as f:
                             f.write(thesaurusString) #write to file
                         print('\tSave Complete! Going back to main menu...')
                         self.__fileName=f'{newFileName}.txt'
@@ -390,8 +392,6 @@ class GUI:
                         error=e.args[0] #get error code
                         if error==22:
                             print(f'\tInvalid Filename! "{newFileName}.txt"')
-                        elif error==17:
-                            print(f'\tFile already exists!')
                         else:
                             print(e)
                         input('\tPress enter to continue...')
@@ -491,6 +491,7 @@ class GUI:
             while True:
                 answer=input('\tProceed? (y/n): ')
                 if answer=='y':
+                    self.__fileName=None 
                     break #proceed to create
                 elif answer=='n':
                     print('\tGoing back to main menu...')

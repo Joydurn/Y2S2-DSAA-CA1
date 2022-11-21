@@ -1,3 +1,4 @@
+# Jayden Yap p2112790 DAAA/2B/04 DSAA CA1 stack.py
 class Stack:
      def __init__(self):
          self.__items = []

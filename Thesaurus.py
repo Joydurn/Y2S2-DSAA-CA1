@@ -1,3 +1,4 @@
+# Jayden Yap p2112790 DAAA/2B/04 DSAA CA1 thesaurus.py
 import random
 import re
 class Thesaurus: 
@@ -7,6 +8,12 @@ class Thesaurus:
         #     ['sad',['depressed','down','dejected','miserable','unhappy','sorrowful','downhearted','despairing','regretful']],
         #     ['happy',['content','cheerful','merry','joyful','jovial','jolly','delighted','gleeful','smiling']],
         #     ['stressed',['anxious','nervous','worried','tensed','unnerved','strained']]
+        # ]
+        #test
+        # self.__fullList=[
+        #     ['brave',['bold','courageous,','daring','fearless','heroic','plucky','valiant']],
+        #     ['cat',['feline','kitten','kitty','pussycat']],
+        #     ['ferocious',['aggressive','barbarous','brutal','cruel','fierce','merciless','savage','unruly','vicious','violent','wild']]
         # ]
     
     def __str__(self):
@@ -167,9 +174,9 @@ class Thesaurus:
     def sortLengthRandomly(self):
         #custom compare function to enable sorting by 2 keys
         def __compare(a, b):
-            if len(a) != len(b):
-                return len(a) > len(b)
-            else:
+            if len(a) != len(b): #sort by length 
+                return len(a) > len(b) 
+            else:  #if same length, randomise
                 #returns a random True or False value 
                 #effectively returning either a>b or a<b for the random part of the sort
                 return bool(random.getrandbits(1))
@@ -242,20 +249,21 @@ class Thesaurus:
             for keyword,synList in [sublist for sublist in self.getFullThesaurus()]:
                 #check if lowercase match
                 if word.islower() and word in synList: 
-                    newString=newString.replace(word,keyword) #replace lowercase
+                    newString=re.sub(fr"\b{word}\b",keyword, newString,count=1) #replace lowercase
                 #check if uppercase match
                 elif word.isupper() and word.lower() in synList:  
-                    newString=newString.replace(word,keyword.upper()) #replace uppercase
+                    newString=re.sub(fr"\b{word}\b",keyword.upper(), newString,count=1) #replace uppercase
                 #check if capitalised match
                 elif isCapital(word) and word.lower() in synList: #check if capitalised
-                    newString=newString.replace(word,keyword.title()) #replace capitalised
+                    newString=re.sub(fr"\b{word}\b",keyword.title(), newString,count=1) #replace capitalised
         return newString
+
 
     def elegantString(self,string): #for elegant we must iterate through the synonyms too
         def getCountList(text):
             #get unique only 
             str_=text
-            wordSet=set([word.lower() for word in self.splitNonAlpha(str_)])
+            wordSet=set([word.lower() for word in self.splitNonAlpha(str_) if word !=''])
             countList=[]
             for word in wordSet: 
                 countList.append(string.lower().count(word)) 
@@ -267,29 +275,31 @@ class Thesaurus:
                 if x.lower()==word.lower():
                     list.append(x)
             return list
-
             
         newString=string
         wordSet,countList=getCountList(newString)
         wordList=self.splitNonAlpha(newString)
-        
+        #we use re.sub to replace instead of str.replace because it only replaces whole words, so it won't replace something that was previously replaced
         for keyword,synList in [sublist for sublist in self.getFullThesaurus()]:
             if keyword in wordSet:
-                index=list(wordSet).index(keyword)
-                if countList[index]>1: #if more than one occurence in string
+                index=list(wordSet).index(keyword) #find index in wordSet for keyword
+
+                if countList[index]>1: #if more than one occurence of this keyword in string
                     occurenceWords=getOccurencesOfOneWord(wordList,keyword) #get all occurences of keyword in string regardless of capitalisation
-                    for count,occurence in enumerate(occurenceWords): #for every occurence
-                        if count>=len(synList): #if not enough synonyms 
-                            count=0 #default count will be 0
+                    for count,occurence in enumerate(occurenceWords): #for every occurence of keyword
+                        if count>=len(synList): #if not enough synonyms (more occurences than synonyms available)
+                            count=0 #default to first synonym
                         #now check capitalisations
-                        if occurence.islower():
-                            newString=newString.replace(occurence,synList[count],1) #replace lowercase
-                        elif occurence.isupper():
-                            newString=newString.replace(occurence,synList[count].upper(),1) #replace uppercase
+                        replacement=synList[count] #get next synonym to be used as replacement
+                        if occurence.isupper(): #if uppercase
+                            newString=re.sub(fr"\b{occurence}\b",replacement.upper(), newString,count=1) #replace uppercase
                         elif occurence[0].isupper() and occurence[1:].islower(): #if capitalised 
-                            newString=newString.replace(occurence,synList[count].title(),1) #replace capitalised
-                else: #else only one occurence
-                    newString.replace(keyword,synList[0],1)
+                            newString=re.sub(fr"\b{occurence}\b",replacement.title(), newString,count=1) #replace capitalised
+                        else: #if mEssY capitalisation/or just lowercase
+                            newString=re.sub(fr"\b{occurence}\b",replacement, newString,count=1) #replace lowercase
+                else: #else only one occurence of keyword
+                    newString=re.sub(fr"\b{keyword}\b",synList[0], newString,count=1)
+                    # newString.replace(keyword,synList[0],1)
         return newString
 
     #EXTRA OPTION 1: Get synonyms for any word
