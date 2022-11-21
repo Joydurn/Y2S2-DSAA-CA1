@@ -26,7 +26,7 @@ class GUI:
     *********************************************************
     ''')
         input('Press enter to continue...\n\n')
-        self.mainMenu() #proceed to main menu
+        self.__mainMenu() #proceed to main menu
         #function called when quit system is called 
 
     def __exitSystem(self):
@@ -38,10 +38,10 @@ class GUI:
                     break #proceed to create
                 elif answer=='n':
                     print('Going back to main menu...')
-                    self.mainMenu()
+                    self.__mainMenu()
                 else:
                     print('Invalid answer, try again... \n')
-        print('\nBye, thanks for using ST1507 DSAA: Thesaurus Based ext Processor\n')
+        print('\nBye, thanks for using ST1507 DSAA: Thesaurus Based Text Processor\n')
         raise SystemExit
 
     #function to print out current menu stack
@@ -104,12 +104,12 @@ class GUI:
         print('Printing Thesaurus now:\n')
         print(thesaurus.getStringFormat())
         input('Press enter to continue...\n')
-        self.mainMenu()
+        self.__mainMenu()
 
 
     #functions to init menu dictionaries and then print them'
     #REMEMBER TO PRIVATE THIS FUNCTION LATER
-    def mainMenu(self):
+    def __mainMenu(self):
        
         menuStack.resetToMain()
         mainMenuList =  [
@@ -130,20 +130,6 @@ class GUI:
             else:
                 mainMenuList.insert(7,["Save As",self.__saveAs])
             
-
-        
-        # mainMenuList =  [
-        # ["New", self.__createNew],
-        # ["Open", self.__openThesaurus],
-        # ["Sort", self.__sortMenu],
-        # ["Process Text",self.__inputTextMenu],
-        # ["Find Synonym",self.__getSynonymFromWord], #to be added (find keyword corresponding to given synonym?)
-        # ["Extra Option Two",None], #to be added (change keyword/synonyms?)
-        # ["Print",self.__printThesaurus],
-        # ["Save",self.__save],
-        # ["Save As",self.__saveAs],
-        # ["Exit", self.__exitSystem]
-        # ]
         self.__printStack()
         self.__printMenu(mainMenuList)
 
@@ -173,7 +159,7 @@ class GUI:
             ['Length/Alphabetically',sortLenAlpha],
             ['Length/Random Alphabetically',sortLenRand],
             ['Randomly',sortRand],
-            ['Back to Main Menu', self.mainMenu],
+            ['Back to Main Menu', self.__mainMenu],
         ]
         menuStack.push('SORT')
         self.__printStack()
@@ -186,7 +172,7 @@ class GUI:
             print('\t(Type 1 to quit)')
             inputText=input('\tPlease input the text you want to process:\n\t')
             if inputText=='1':
-                self.mainMenu()
+                self.__mainMenu()
             else:
                 self.__processTextMenu(inputText)
 
@@ -198,7 +184,7 @@ class GUI:
             print('\t(Type 1 to quit)')
             fileName=input('\tPlease enter full file name you want to open: (with .txt):\n\t')
             if fileName=='1':
-                self.mainMenu()
+                self.__mainMenu()
             else:
                 try:
                     with open(f"text/{fileName}","r") as f:
@@ -219,7 +205,7 @@ class GUI:
         processTextMenuList=[
         ["Input your own Text",inputText],
         ["Open a text file",__openText],
-        ["Back to Main Menu",self.mainMenu]
+        ["Back to Main Menu",self.__mainMenu]
         ]
         self.__printStack()
         self.__printMenu(processTextMenuList)
@@ -265,7 +251,7 @@ class GUI:
                             f.write(processed) #write to file
                         print('Save Complete! Going back to main menu...')
                         input('Press enter to continue...')
-                        self.mainMenu()
+                        self.__mainMenu()
                     except Exception as e:
                         error=e.args[0] #get error code
                         if error==22:
@@ -286,7 +272,7 @@ class GUI:
         processTextMenuList=[
         ["Simplified Writing",__simpWriting],
         ["Elegant Writing",__elegWriting],
-        ["Back to Main Menu",self.mainMenu]
+        ["Back to Main Menu",self.__mainMenu]
         ]
         self.__printStack()
         self.__printMenu(processTextMenuList)
@@ -300,7 +286,7 @@ class GUI:
         print('\t(Type 1 to quit)')
         fileName=input('\tPlease enter full file name you want to open: (with .txt):\n\t')
         if fileName=='1':
-            self.mainMenu()
+            self.__mainMenu()
         else:
             try:
                 with open(f"thesaurus/{fileName}","r") as f:
@@ -321,7 +307,7 @@ class GUI:
         if thesaurus.isEmpty(): #if no thesaurus
             print('ERROR: No thesaurus found, try creating or opening one first, Returning to main menu')
             input('Press enter to continue...\n\n')
-            self.mainMenu()
+            self.__mainMenu()
         elif self.__fileName==None:
             print('No file loaded, redirecting to Save As function...')
             self.__saveAs()
@@ -338,7 +324,7 @@ class GUI:
                     f.write(thesaurusString) #write to file
                 print('\tSave Complete! Going back to main menu...')
                 input('\tPress enter to continue...')
-                self.mainMenu()
+                self.__mainMenu()
             except Exception as e:
                 error=e.args[0] #get error code
                 if error==22:
@@ -349,7 +335,7 @@ class GUI:
                 menuStack.pop() 
                 self.__save()
         elif answer=='n':
-            self.mainMenu()
+            self.__mainMenu()
         else:
             print('Invalid answer, please try again!')
             input('Press enter to continue...')
@@ -360,7 +346,7 @@ class GUI:
         if thesaurus.size()==0: #if no thesaurus
             print('ERROR: No thesaurus found, try creating or opening one first, Returning to main menu')
             input('Press enter to continue...\n\n')
-            self.mainMenu()
+            self.__mainMenu()
         
         menuStack.push('Save As')
         self.__printStack()
@@ -370,7 +356,7 @@ class GUI:
         print('\t(Type 1 to quit)')
         newFileName=input(f'\tPlease enter new filename (without .txt): ').strip()
         if newFileName=='1': 
-            self.mainMenu()
+            self.__mainMenu()
         else:
             while True: 
                 if f'{newFileName}.txt' in directory: #if existing file name
@@ -387,7 +373,7 @@ class GUI:
                         print('\tSave Complete! Going back to main menu...')
                         self.__fileName=f'{newFileName}.txt'
                         input('\tPress enter to continue...')
-                        self.mainMenu()
+                        self.__mainMenu()
                     except Exception as e:
                         error=e.args[0] #get error code
                         if error==22:
@@ -442,7 +428,7 @@ class GUI:
                 if keyword=='1':
                     __finishThesaurus()
                 elif keyword=='2':
-                    self.mainMenu()
+                    self.__mainMenu()
                 else:
                     keyInvalid=self.__keyIsInvalid(keyword)
             #now get synonyms
@@ -463,7 +449,7 @@ class GUI:
                 if synonym=='1':
                     break 
                 elif synonym=='2':
-                    self.mainMenu()
+                    self.__mainMenu()
                 #add synonym 
                 synList.append(synonym)
                 synCount+=1
@@ -481,7 +467,7 @@ class GUI:
                 thesaurus.sortAlphabetically()
                 thesaurus.sortKeywords()
                 self.__printThesaurus()
-                self.mainMenu()
+                self.__mainMenu()
 
         menuStack.push('New Thesaurus')
         self.__printStack()
@@ -495,7 +481,7 @@ class GUI:
                     break #proceed to create
                 elif answer=='n':
                     print('\tGoing back to main menu...')
-                    self.mainMenu()
+                    self.__mainMenu()
                 else:
                     print('\tInvalid answer, try again... \n')
         #refresh thesaurus to empty
@@ -528,7 +514,7 @@ class GUI:
         print('\t(Type 1 to quit)')
         word=input('\tPlease enter your input word: ')
         if word=='1':
-            self.mainMenu()
+            self.__mainMenu()
         else:
             synList=thesaurus.findSynonymFromWord(word)
             if synList is None:
@@ -578,7 +564,7 @@ class GUI:
                 if synonym=='1':
                     break #break to start adding keyword 
                 elif synonym=='2':
-                    self.mainMenu()
+                    self.__mainMenu()
                 #add synonym to list
                 synList.append(synonym)
                 synCount+=1 
@@ -629,7 +615,7 @@ class GUI:
                     if synonym=='1':
                         break 
                     elif synonym=='2':
-                        self.mainMenu()
+                        self.__mainMenu()
                     #add synonym 
                     synList.append(synonym)
                     synCount+=1
@@ -637,7 +623,7 @@ class GUI:
                 thesaurus.addSynToKey(keyword,synList)
                 print(f"\tSuccessfully added synonyms to '{keyword}'!")
                 input("\tPress enter to continue...")
-                self.mainMenu()
+                self.__mainMenu()
         
         def removeKeyword():
             menuStack.push('Remove Keyword')
@@ -680,7 +666,7 @@ class GUI:
             ['Add Keyword with Synonyms',addKeyword],
             ['Add Synonyms to Keyword',addSynonym],
             ['Remove Keyword with Synonyms',removeKeyword],
-            ['Back to Main Menu', self.mainMenu],
+            ['Back to Main Menu', self.__mainMenu],
         ]
         menuStack.push('Edit Thesaurus')
         self.__printStack()

@@ -1,4 +1,8 @@
 # Jayden Yap p2112790 DAAA/2B/04 DSAA CA1 thesaurus.py
+#List implementation
+#List vs linked list:
+#Linked list: Faster insertion/deletion 
+#List: Faster element lookup and sorting (at least for quicksort)
 import random
 import re
 class Thesaurus: 
