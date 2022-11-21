@@ -2,10 +2,10 @@
 # Main program to run menu system
 #import modules
 from os import listdir
-from stack import menu_stack
+from stack import menuStackLL
 from thesaurus import Thesaurus
 thesaurus=Thesaurus()
-menuStack=menu_stack()
+menuStack=menuStackLL()
 class GUI:
     def __init__(self):
         self.__name='Jayden Yap'
@@ -49,9 +49,10 @@ class GUI:
         #print current menu stack
         stackString='*'*54+'\n* ' 
         menusString=''
-        for index,item in enumerate(menuStack.getList()): 
+        for index,node in enumerate(menuStack): 
+            item=node.element
             if index>0:
-                menusString+=' > ' #add connector if not first menu
+                menusString+=' < ' #add connector if not first menu
             menusString+=f'{item.upper()}'
         stackString+=menusString.ljust(51) #add padding for formatting
         stackString+='*\n'
@@ -67,7 +68,7 @@ class GUI:
     def __printMenu(self,menuList):
         #printing the options
         for index,subList in enumerate(menuList):
-            if menuStack.size()>1: #if we on at least 2nd level of menu
+            if menuStack.size>1: #if we on at least 2nd level of menu
                 print('\t',end=" ") #Indent text
             print(f'{index+1}: {subList[0]}')
         
