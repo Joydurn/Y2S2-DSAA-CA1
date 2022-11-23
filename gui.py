@@ -282,6 +282,21 @@ class GUI:
     def __openThesaurus(self):
         menuStack.push('Open')
         self.__printStack()
+        #check if thesaurus exists already
+        if thesaurus.size()!=0:
+            print('\tWARNING: A thesaurus is already loaded, proceeding will delete the previous thesaurus (unless it was already saved)')
+            while True:
+                answer=input('\tProceed? (y/n): ')
+                if answer=='y':
+                    self.__fileName=None 
+                    break #proceed to create
+                elif answer=='n':
+                    print('\tGoing back to main menu...')
+                    self.__mainMenu()
+                else:
+                    print('\tInvalid answer, try again... \n')
+
+        
         print('\tAvailable files:')
         print('\t'+', '.join(listdir('thesaurus'))) #tab followed by all filenames seperated by ', '
         print('\t(Type 1 to quit)')
@@ -292,6 +307,7 @@ class GUI:
             try:
                 with open(f"thesaurus/{fileName}","r") as f:
                     string=f.read() #read from file
+                string=string.lower()
                 thesaurus.createFromString(string)
                 print(f'Successfully read Thesaurus from file "{fileName}"')
                 self.__fileName=fileName

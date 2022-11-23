@@ -47,25 +47,37 @@ class Thesaurus:
                 if x==':':
                     keyIndex=index 
                     break
+                elif not x.isalpha(): #if not alphabetic
+                    raise Exception('Non-alphabetic detected')
             keyword=lineString[0:keyIndex]
             synString=lineString[keyIndex+2:] #string of all synonyms
             #now find synonym list
             synList=[]
             newSynIndex=None
             lastIndex=0
+            nextIsSpace=False
             for index,x in enumerate(synString):
                 if x==',': #if comma 
-                    newSynIndex=index
+                    newSynIndex=index #end index of new synonym
                     synList.append(synString[lastIndex:newSynIndex]) #append new synonym
-                    lastIndex=index+2 #new start index of next synonym 
+                    #check that next element is a space (otherwise error)
+                    if synString[index+1]!=' ':
+                        raise Exception('Invalid formatting1')
+                    else:
+                        lastIndex=index+2 #new start index of next synonym 
+                        nextIsSpace=True
+                elif x==' ' and not nextIsSpace:
+                    raise Exception('Invalid formatting2')
+                elif not x.isalpha() and x!=' ': #if x not letter or space, raise error 
+                    raise Exception('Invalid formatting3')
                 elif index==len(synString)-1: #if end of string
                     newSynIndex=index
                     synList.append(synString[lastIndex:newSynIndex+1]) #append new synonym
-                    lastIndex=index+2 #new start index of next synonym 
             self.addKeySynPair(keyword,synList)
-        self.__fullList=[]
+        self.refresh()
         for line in string.splitlines(): #iterate through each line
             addFromOneLineString(line)
+            #if returned here
             
     
     def size(self):
