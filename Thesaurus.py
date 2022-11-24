@@ -1,33 +1,27 @@
 # Jayden Yap p2112790 DAAA/2B/04 DSAA CA1 thesaurus.py
-#List implementation
+#Implemented thesaurus class using a 3D list
 #List vs linked list:
 #Linked list: Faster insertion/deletion 
 #List: Faster element lookup and sorting (at least for quicksort)
+#Decided to use list because of all these operations, sorting is the one that takes the longest, so performance on average for any of these operations would be about the same on a list
+
 import random
 import re
 class Thesaurus: 
     def __init__(self):
         self.__fullList=[]
-        # self.__fullList=[
-        #     ['sad',['depressed','down','dejected','miserable','unhappy','sorrowful','downhearted','despairing','regretful']],
-        #     ['happy',['content','cheerful','merry','joyful','jovial','jolly','delighted','gleeful','smiling']],
-        #     ['stressed',['anxious','nervous','worried','tensed','unnerved','strained']]
-        # ]
-        #test
-        # self.__fullList=[
-        #     ['brave',['bold','courageous,','daring','fearless','heroic','plucky','valiant']],
-        #     ['cat',['feline','kitten','kitty','pussycat']],
-        #     ['ferocious',['aggressive','barbarous','brutal','cruel','fierce','merciless','savage','unruly','vicious','violent','wild']]
-        # ]
-    
-    def __str__(self):
+        
+    def __str__(self): #when printed, return the list
         return f'{self.__fullList}'
 
+    #is the thesaurus empty?
     def isEmpty(self):
         if not self.__fullList:
             return True 
         else: 
             return False
+    
+    #returns the proper format for printing/saving the thesaurus
     def getStringFormat(self):
         fullList=self.getFullThesaurus()
         string=''
@@ -79,36 +73,44 @@ class Thesaurus:
             addFromOneLineString(line)
             #if returned here
             
-    
+    #return number of keywords
     def size(self):
         return len(self.__fullList)
 
+    #simply returns full thesaurus
     def getFullThesaurus(self):
         return self.__fullList
 
+    #return list of all keywords
     def getKeywords(self):
         return [subList[0] for subList in self.__fullList]
     
+    #return list of sublists of synonyms
     def getAllSynonyms(self):
         return [subList[1] for subList in self.__fullList]
 
+    #get a list of synonyms depending on keyword
     def getSynonyms(self,keyword):
         for subList in self.__fullList: 
             if subList[0]==keyword: 
                 return subList[1]
     
+    #add a keyword with no synonyms
     def addKeyword(self,keyword):
         self.__fullList.append([keyword,None])
 
+    #add one or more synonyms to a keyword
     def addSynToKey(self,keyword,synList): #add to existing keyword
         for keyIndex,subList in enumerate(self.__fullList):
             if subList[0]==keyword:
                 for synonym in synList:
                     self.__fullList[keyIndex][1].append(synonym)
 
+    #add a keyword along with list of synonyms
     def addKeySynPair(self,keyword,synList):
         self.__fullList.append([keyword,synList])
     
+    #remove a keyword along with synonyms
     def removeKeyword(self,keyword):
         for keyIndex,subList in enumerate(self.__fullList):
             if subList[0]==keyword:
@@ -117,7 +119,28 @@ class Thesaurus:
     #refresh the thesaurus to empty 
     def refresh(self):
         self.__fullList=[]
+
     #*****************SORTING ALGORITHMS ***********************
+    #only used when creating thesaurus and opening
+    def sortKeywords(self): 
+        def __sort(keySynPairList): #actual algorithm used
+            if len(keySynPairList) <=1:
+                return keySynPairList
+            else:
+                pivot = keySynPairList.pop()
+
+            items_greater = []
+            items_lower = []
+
+            for item in keySynPairList:
+                if item[0] > pivot[0]:
+                    items_greater.append(item)
+                else:
+                    items_lower.append(item)
+
+            return __sort(items_lower) + [pivot] + __sort(items_greater)
+        self.__fullList=__sort(self.__fullList)
+
     #sort alphabetically (quicksort)
     def sortAlphabetically(self):
         def __sort(symList): #actual algorithm used
@@ -139,26 +162,8 @@ class Thesaurus:
         for keyIndex,subList in enumerate(self.__fullList): #sorting every synonym list
             symList=subList[1]
             self.__fullList[keyIndex][1]=__sort(symList)
-            
-    def sortKeywords(self): #only used when creating thesaurus and opening
-        def __sort(keySynPairList): #actual algorithm used
-            if len(keySynPairList) <=1:
-                return keySynPairList
-            else:
-                pivot = keySynPairList.pop()
 
-            items_greater = []
-            items_lower = []
-
-            for item in keySynPairList:
-                if item[0] > pivot[0]:
-                    items_greater.append(item)
-                else:
-                    items_lower.append(item)
-
-            return __sort(items_lower) + [pivot] + __sort(items_greater)
-        self.__fullList=__sort(self.__fullList)
-
+    
     #sort by length then alphabetically (quicksort)
     def sortLengthAlphabetically(self):
         #custom compare function to enable sorting by 2 keys
@@ -237,10 +242,13 @@ class Thesaurus:
             symList=subList[1]
             self.__fullList[keyIndex][1]=__sort(symList)
     
-    def splitNonAlpha(self,s):  #splits string into different words, ignoring punctuations and spaces
+    #splits a string into different words, ignoring punctuations and spaces
+    #used by a few functions
+    def splitNonAlpha(self,s):  
             list=re.split('\W+', s)
             return list
 
+    #takes a string and turns any word that matches a synonym into the corresponding keyword, returns new string
     def simplifyString(self,string):
         #check if a word is capitalised
         def isCapital(word):
@@ -274,7 +282,7 @@ class Thesaurus:
                     newString=re.sub(fr"\b{word}\b",keyword.title(), newString,count=1) #replace capitalised
         return newString
 
-
+    #takes a string and turns any word that matches a keyword into a synonym, alternating the synonyms in order, returns new string
     def elegantString(self,string): #for elegant we must iterate through the synonyms too
         def getCountList(text):
             #get unique only 

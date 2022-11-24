@@ -1,4 +1,4 @@
-import os
+# Jayden Yap p2112790 DAAA/2B/04 DSAA CA1 stack.py
 #use linked list for our stack as it is a appropriate data structure for accessing elements only at the edge of structure
 class _Node:
     '''
