@@ -19,6 +19,10 @@ class GUI:
         self.__courseClass='DAAA/2B/04'
         self.__fileName=None #file name to be loaded if a file is opened
 
+    #return colored text depending on RGB values
+    def colored(self,r, g, b, text):
+        return "\033[38;2;{};{};{}m{} \033[38;2;255;255;255m".format(r, g, b, text)
+
     #WELCOME MENU: the only non-privated function, redirects to main menu
     def welcomeMenu(self):
         print(f'''
@@ -34,12 +38,12 @@ class GUI:
     ''')
         input('Press enter to continue...\n\n')
         self.__mainMenu() #proceed to main menu
-        
+    
     #EXIT SYSTEM
     def __exitSystem(self):
         #warn if thesaurus is loaded
         if not thesaurus.isEmpty():
-            print('WARNING: A thesaurus is already loaded, proceeding will delete the previous thesaurus (unless it was already saved)')
+            print(f'{self.colored(255,0,0,"WARNING")}: A thesaurus is already loaded, proceeding will delete the previous thesaurus (unless it was already saved)')
             while True:
                 answer=input('Proceed? (y/n): ')
                 if answer=='y':
@@ -48,7 +52,7 @@ class GUI:
                     print('Going back to main menu...')
                     self.__mainMenu()
                 else:
-                    print('Invalid answer, try again... \n')
+                    print(f'{self.colored(255,165,0,"Invalid")} answer, try again... \n')
         print('\nBye, thanks for using ST1507 DSAA: Thesaurus Based Text Processor\n')
         raise SystemExit
 
@@ -71,7 +75,7 @@ class GUI:
             stackString+=loadedString.ljust(53)+'*\n'
         elif not thesaurus.isEmpty(): #if thesaurus was created
             stackString+='* THESAURUS LOADED'.ljust(53)+'*\n'
-        print(stackString)
+        print(self.colored(0,255,255,stackString))
 
     #PRINT OUT A MENU BASED ON LIST
     #list contains sublists with 2 elements each, 1st is Menu Option Name, 2nd is Menu Option Function
@@ -101,7 +105,7 @@ class GUI:
             self.__printStack()
             self.__printMenu(menuList)
         else:
-            print(f"\n\n{userAnswer} is a Invalid Answer!")
+            print(f"\n\n{userAnswer} is a {self.colored(255,165,0,'Invalid')} Answer!")
             input('Press enter to continue...\n\n')
             self.__printStack()
             self.__printMenu(menuList) #recursion (restart menu)
@@ -157,7 +161,7 @@ class GUI:
                         print('\t\t(Type 1 if done with this keyword, type 2 to quit)')
                     else: 
                         print('\t\t(Type 2 to quit)')
-                    synonym=input(f'\t\tEnter {self.__makeOrdinal(synCount)} synonym for {keyword}: ').strip().lower() 
+                    synonym=input(f'\t\tEnter {self.__makeOrdinal(synCount)} synonym for {self.colored(0,255,255,keyword)}: ').strip().lower() 
                     if synonym=='2' or (synCount>1 and synonym=='1'):
                         break
                     synInvalid=self.__synIsInvalid(keyword,synonym,synList)
@@ -173,7 +177,7 @@ class GUI:
 
         def __finishThesaurus():
             #check if there are keywords
-            if thesaurus.size()==0:
+            if thesaurus.isEmpty():
                 input('No keywords entered! Press enter to continue...')
                 return 
             else:
@@ -188,7 +192,7 @@ class GUI:
         self.__printStack()
         #check if thesaurus exists already
         if thesaurus.size()!=0:
-            print('\tWARNING: A thesaurus is already loaded, proceeding will delete the previous thesaurus (unless it was already saved)')
+            print(f'\t{self.colored(255,0,0,"WARNING")}: A thesaurus is already loaded, proceeding will delete the previous thesaurus (unless it was already saved)')
             while True:
                 answer=input('\tProceed? (y/n): ')
                 if answer=='y':
@@ -198,7 +202,7 @@ class GUI:
                     print('\tGoing back to main menu...')
                     self.__mainMenu()
                 else:
-                    print('\tInvalid answer, try again... \n')
+                    print(f'\t{self.colored(255,165,0,"Invalid")} answer, try again... \n')
         #refresh thesaurus to empty
         thesaurus.refresh()
         keywordCount=0
@@ -214,8 +218,8 @@ class GUI:
         menuStack.push('Open')
         self.__printStack()
         #check if thesaurus exists already
-        if thesaurus.size()!=0:
-            print('\tWARNING: A thesaurus is already loaded, proceeding will delete the previous thesaurus (unless it was already saved)')
+        if not thesaurus.isEmpty():
+            print(f'\t{self.colored(255,0,0,"WARNING")}: A thesaurus is already loaded, proceeding will delete the previous thesaurus (unless it was already saved)')
             while True:
                 answer=input('\tProceed? (y/n): ')
                 if answer=='y':
@@ -225,7 +229,7 @@ class GUI:
                     print('\tGoing back to main menu...')
                     self.__mainMenu()
                 else:
-                    print('\tInvalid answer, try again... \n')
+                    print(f'\t{self.colored(255,165,0,"Invalid")} answer, try again... \n')
 
         
         print('\tAvailable files:')
@@ -238,7 +242,7 @@ class GUI:
             try:
                 with open(f"thesaurus/{fileName}","r") as f:
                     string=f.read() #read from file
-                string=string.lower()
+                string=string.strip().lower()
                 thesaurus.createFromString(string)
                 print(f'Successfully read Thesaurus from file "{fileName}"')
                 self.__fileName=fileName
@@ -384,7 +388,7 @@ class GUI:
                     except Exception as e:
                         error=e.args[0] #get error code
                         if error==22:
-                            print(f'Invalid Filename! "{fileName}.txt"')
+                            print(f'{self.colored(255,165,0,"Invalid")} Filename! "{fileName}.txt"')
                         elif error==17:
                             print(f'File already exists!')
                         else:
@@ -393,7 +397,7 @@ class GUI:
                         menuStack.pop() 
                         __saveFile(processed)
             else:
-                print("Invalid input, please try again...")
+                print(f"{self.colored(255,165,0,'Invalid')} input, please try again...")
                 input('Press enter to continue...')
                 __saveFile(processed)
 
@@ -442,7 +446,7 @@ class GUI:
             except Exception as e:
                 error=e.args[0] #get error code
                 if error==22:
-                    print(f'\tInvalid Filename! "{self.__fileName}"')
+                    print(f'\t{self.colored(255,165,0,"Invalid")} Filename! "{self.__fileName}"')
                 else:
                     print(e)
                 input('\tPress enter to continue...')
@@ -451,14 +455,14 @@ class GUI:
         elif answer=='n':
             self.__mainMenu()
         else:
-            print('Invalid answer, please try again!')
+            print(f'{self.colored(255,165,0,"Invalid")} answer, please try again!')
             input('Press enter to continue...')
             menuStack.pop()
             self.__save()
 
     #SAVE THESAURUS AS NEW FILE
     def __saveAs(self):
-        if thesaurus.size()==0: #if no thesaurus
+        if thesaurus.isEmpty(): #if no thesaurus
             print('ERROR: No thesaurus found, try creating or opening one first, Returning to main menu')
             input('Press enter to continue...\n\n')
             self.__mainMenu()
@@ -475,7 +479,7 @@ class GUI:
         else:
             while True: 
                 if f'{newFileName}.txt' in directory: #if existing file name
-                    print(f'\tWARNING: A file with name {newFileName}.txt already exists!')
+                    print(f'\t{self.colored(255,0,0,"WARNING")}: A file with name {newFileName}.txt already exists!')
                 confirm=input(f'\tAre you sure you want to save to /thesaurus/{newFileName}.txt? (y/n): ').strip().lower()
                 if confirm=='n':
                     menuStack.pop()
@@ -492,25 +496,22 @@ class GUI:
                     except Exception as e:
                         error=e.args[0] #get error code
                         if error==22:
-                            print(f'\tInvalid Filename! "{newFileName}.txt"')
+                            print(f'\t{self.colored(255,165,0,"Invalid")} Filename! "{newFileName}.txt"')
                         else:
                             print(e)
                         input('\tPress enter to continue...')
                         menuStack.pop() 
                         self.__saveAs()
                 else:
-                    print('\tInvalid answer! Please try again...')
+                    print(f'\t{self.colored(255,165,0,"Invalid")} answer! Please try again...')
                     print('\tPress enter to continue')
 
     
     #************UTILITY FUNCTIONS USED BY 'NEW THESAURUS' AND EXTRA OPTION FUNCTIONS**************
     #function to check if keys are valid
     def __keyIsInvalid(self,keyword):
-        if keyword in thesaurus.getKeywords():
-            print('\tKeyword already exists, please try again...')
-            return True
-        elif any(keyword in sublist for sublist in thesaurus.getAllSynonyms()): 
-            print('\tKeyword already exists as a synonym, please try again...')
+        if thesaurus.isInThesaurus(keyword):
+            print('\tKeyword already in thesaurus')
             return True
         elif not keyword.isalpha(): #check if has numbers/symbols
             print('\tOnly letters allowed, no numbers,symbols or spaces, try again')
@@ -519,14 +520,14 @@ class GUI:
             return False
     #function to check if synonym is valid, more lenient than for keyword
     def __synIsInvalid(self,keyword,synonym,synList):
-        if synonym in thesaurus.getKeywords() or synonym==keyword:
-            print('\t\tSynonym is already a keyword! Please try again...')
+        if thesaurus.isInThesaurus(synonym):
+            print('\t\tSynonym is already a keyword or a synonym in thesaurus! Please try again...')
+            return True
+        elif synonym==keyword: 
+            print('\t\tSynonym is the keyword you entered')
             return True
         elif synonym in synList: #if was already entered
             print('\t\tSynonym already entered, please try again...')
-            return True
-        elif any(synonym in sublist for sublist in thesaurus.getAllSynonyms()): 
-            print('\t\tSynonym already exists for another keyword, please try again...')
             return True
         elif not synonym.isalpha(): #check if has numbers/symbols
             print('\t\tOnly letters allowed, no numbers or symbols, try again')
@@ -602,7 +603,7 @@ class GUI:
                         print('\t\t(Type 1 if done with keyword, type 2 to quit)')
                     else:
                         print('\t\t(Type 2 to quit)')
-                    synonym=input(f'\t\tEnter {self.__makeOrdinal(synCount)} synonym for {keyword}: ').strip().lower()
+                    synonym=input(f'\t\tEnter {self.__makeOrdinal(synCount)} synonym for {self.colored(0,255,255,keyword)}: ').strip().lower()
                     if synonym=='2' or (synCount>1 and synonym=='1'):
                         break 
                     synInvalid=self.__synIsInvalid(keyword,synonym,synList)
@@ -653,7 +654,7 @@ class GUI:
                             print('\t\t(Type 1 if done with this keyword, type 2 to quit)')
                         else: 
                             print('\t\t(Type 2 to quit)')
-                        synonym=input(f'\t\tEnter {self.__makeOrdinal(synCount)} synonym for {keyword}: ').strip().lower()
+                        synonym=input(f'\t\tEnter {self.__makeOrdinal(synCount)} synonym for {self.colored(0,255,255,keyword)}: ').strip().lower()
                         if synonym=='2' or (synCount>1 and synonym=='1'):
                             break
                         synInvalid=self.__synIsInvalid(keyword,synonym,synList)
@@ -665,7 +666,14 @@ class GUI:
                     synList.append(synonym)
                     synCount+=1
                 #all done, add synonyms
-                thesaurus.addSynToKey(keyword,synList)
+                try:
+                    thesaurus.addSynToKey(keyword,synList)
+                except: 
+                    print(e)
+                    print('Please try again...')
+                    input('Press enter to continue...')
+                    menuStack.pop()
+                    addSynonym()
                 print(f"\tSuccessfully added synonyms to '{keyword}'!")
                 input("\tPress enter to continue...")
                 self.__mainMenu()
@@ -703,7 +711,7 @@ class GUI:
                         menuStack.pop()
                         self.__editThesaurusMenu()
                     else:
-                        print('Invalid answer please try again!')
+                        print(f'{self.colored(255,165,0,"Invalid")} answer please try again!')
                         input('Press enter to continue...')
                         
 

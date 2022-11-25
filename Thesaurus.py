@@ -66,7 +66,9 @@ class Thesaurus:
                     raise Exception('Invalid formatting3')
                 elif index==len(synString)-1: #if end of string
                     newSynIndex=index
-                    synList.append(synString[lastIndex:newSynIndex+1]) #append new synonym
+                    word=synString[lastIndex:newSynIndex+1]
+                    synList.append(word) #append new synonym
+
             self.addKeySynPair(keyword,synList)
         self.refresh()
         for line in string.splitlines(): #iterate through each line
@@ -97,17 +99,46 @@ class Thesaurus:
     
     #add a keyword with no synonyms
     def addKeyword(self,keyword):
+        if self.isInThesaurus(keyword):
+            raise Exception('Keyword exists in thesaurus')
         self.__fullList.append([keyword,None])
+
+    #return single list of every keyword/synonym (used for checking)
+    def getWords(self):
+        completeList=[]
+        for keyword in self.getKeywords():
+            completeList.append(keyword)
+        for synList in self.getAllSynonyms():
+            for syn in synList: 
+                completeList.append(syn)
+        return completeList 
+
+    #check if word exists in thesaurus
+    def isInThesaurus(self,word):
+        completeList=self.getWords()
+        if word in completeList:
+            return True 
+        else:
+            return False
 
     #add one or more synonyms to a keyword
     def addSynToKey(self,keyword,synList): #add to existing keyword
         for keyIndex,subList in enumerate(self.__fullList):
             if subList[0]==keyword:
                 for synonym in synList:
+                    if self.isInThesaurus(synonym):
+                        raise Exception('Synonym already in thesaurus')
                     self.__fullList[keyIndex][1].append(synonym)
 
     #add a keyword along with list of synonyms
     def addKeySynPair(self,keyword,synList):
+        if self.isInThesaurus(keyword):
+            raise Exception('Keyword is a duplicate')
+        for syn in synList:
+            if self.isInThesaurus(syn):
+                raise Exception('Synonym is a duplicate')
+        
+        
         self.__fullList.append([keyword,synList])
     
     #remove a keyword along with synonyms
