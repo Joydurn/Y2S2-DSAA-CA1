@@ -297,7 +297,6 @@ class Thesaurus:
                 
         newString=string
         wordsList=self.splitNonAlpha(newString) #get individual words
-        print(wordsList)
         #for every word in the string
         for word in wordsList:
             #check if word matches keyword

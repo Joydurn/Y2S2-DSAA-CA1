@@ -191,7 +191,7 @@ class GUI:
         menuStack.push('New Thesaurus')
         self.__printStack()
         #check if thesaurus exists already
-        if thesaurus.size()!=0:
+        if thesaurus.isEmpty():
             print(f'\t{self.colored(255,0,0,"WARNING")}: A thesaurus is already loaded, proceeding will delete the previous thesaurus (unless it was already saved)')
             while True:
                 answer=input('\tProceed? (y/n): ')
@@ -247,6 +247,7 @@ class GUI:
                 print(f'Successfully read Thesaurus from file "{fileName}"')
                 self.__fileName=fileName
                 thesaurus.sortKeywords() #sort the keywords alphabetically
+                thesaurus.sortAlphabetically() #sort synonyms
                 self.__printThesaurus()
             except Exception as e:
                 print(e)
@@ -269,7 +270,7 @@ class GUI:
 
         def sortLenRand():
             print('Sorting synonyms first by Length, then randomly...')
-            thesaurus.sortLengthAlphabetically()
+            thesaurus.sortLengthRandomly()
             self.__printThesaurus()
 
         def sortRand():
@@ -375,7 +376,7 @@ class GUI:
             userInput=input('\tDo you want to save text to a file? y/n: ')
             if userInput=='n':
                 print('Going back to main menu...')
-                self.mainMenu()
+                self.__mainMenu()
             elif userInput=='y':
                 while True:
                     fileName=input('Enter a file name (excluding .txt): ')
